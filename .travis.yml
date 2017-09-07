@@ -6,6 +6,10 @@ os:
 julia:
   - 0.6
   - nightly
+addons:
+  apt:
+    packages:
+    - hdf5-tools # work around HDF5 install issue on Trusty, see https://discourse.julialang.org/t/hdf5-fails-on-travis-ci-with-trusty-works-with-precise/4961
 notifications:
   email: false
 matrix:

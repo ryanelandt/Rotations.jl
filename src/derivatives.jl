@@ -105,23 +105,20 @@ function jacobian(::Type{Quat},  X::SPQuat)
     alpha2 = X.x * X.x + X.y * X.y + X.z * X.z
     dA2dX = 2 * vspq
 
-    # the function we're differentiating forces q.w +ve
-    qs = sign((1-alpha2) / (alpha2 + 1))
-
     # f = (1-alpha2) / (alpha2 + 1);
     den2 = (alpha2 + 1) * (alpha2 + 1)
-    dQ1dX = qs * (-dA2dX * (alpha2 + 1) - dA2dX * (1-alpha2)) / den2
+    dQ1dX = (-dA2dX * (alpha2 + 1) - dA2dX * (1-alpha2)) / den2
 
     # do the on diagonal terms
     # f = 2*x / (alpha2 + 1) => g = 2*x, h = alpha2 + 1
     # df / dx = (dg * h - dh * g) / (h^2)
-    dQiDi = qs * 2 * ((alpha2 + 1) - dA2dX .* vspq) / den2
+    dQiDi = 2 * ((alpha2 + 1) - dA2dX .* vspq) / den2
 
     # do the off entries
     # f = 2x / (alpha2 + 1)
-    dQxDi = qs * -2 * vspq[1] * dA2dX / den2
-    dQyDi = qs * -2 * vspq[2] * dA2dX / den2
-    dQzDi = qs * -2 * vspq[3] * dA2dX / den2
+    dQxDi = -2 * vspq[1] * dA2dX / den2
+    dQyDi = -2 * vspq[2] * dA2dX / den2
+    dQzDi = -2 * vspq[3] * dA2dX / den2
 
     # assemble it all
     dQdX = @SMatrix [ dQ1dX[1]  dQ1dX[2]  dQ1dX[3] ;

@@ -80,9 +80,10 @@ end
 
 @inline function Base.convert(::Type{AA}, q::Quat) where AA <: AngleAxis
     # TODO: consider how to deal with derivative near theta = 0
+    qs = sign(q.w)
     s = sqrt(q.x*q.x + q.y*q.y + q.z*q.z)
-    theta =  2 * atan(s, q.w)
-    return s > 0 ? AA(theta, q.x / s, q.y / s, q.z / s, false) : AA(theta, one(theta), zero(theta), zero(theta), false)
+    theta =  2 * atan(s, qs * q.w)
+    return s > 0 ? AA(theta, qs * q.x / s, qs * q.y / s, qs * q.z / s, false) : AA(theta, one(theta), zero(theta), zero(theta), false)
 end
 
 # Using Rodrigues formula on an AngleAxis parameterization (assume unit axis length) to do the rotation

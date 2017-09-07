@@ -19,3 +19,12 @@ function perpendicular_vector(vec::SVector{3})
     @inbounds perpind2 = vec[ind1]
     perp = @SVector [ifelse(i == ind1, perpind1, ifelse(i == ind2, perpind2, zero(T))) for i = 1 : 3]
 end
+
+"""
+    angle_difference(a, b)
+
+Compute the difference between two angles in such a way that:
+* for angles `a` and `b` (in radians), and `c = angle_difference(a, b)`, `cos(a) ≈ cos(b + c)` and `sin(a) ≈ sin(b + c)`;
+* the result is in the interval [-π, π).
+"""
+angle_difference(a, b) = mod2pi(a - b + π) - π

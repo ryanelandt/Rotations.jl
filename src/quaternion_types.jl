@@ -43,10 +43,45 @@ end
 
 # These 3 functions are enough to satisfy the entire StaticArrays interface:
 function (::Type{Q})(t::NTuple{9}) where Q<:Quat
-    q = Q(sqrt(abs(1  + t[1] + t[5] + t[9])) / 2,
-               copysign(sqrt(abs(1 + t[1] - t[5] - t[9]))/2, t[6] - t[8]),
-               copysign(sqrt(abs(1 - t[1] + t[5] - t[9]))/2, t[7] - t[3]),
-               copysign(sqrt(abs(1 - t[1] - t[5] + t[9]))/2, t[2] - t[4]))
+  """
+  DERIVATION OF THE EULER–RODRIGUES FORMULA
+  FOR THREE-DIMENSIONAL ROTATIONS
+  FROM THE GENERAL FORMULA
+  FOR FOUR-DIMENSIONAL ROTATIONS
+  Johan Ernest Mebius∗
+  January 2007
+
+  https://arxiv.org/pdf/math/0701759.pdf
+  This solves the system of equations in Section 3.1
+  """
+
+  a = 1.0 + t[1] + t[5] + t[9]
+  b = 1.0 + t[1] - t[5] - t[9]
+  c = 1.0 - t[1] + t[5] - t[9]
+  d = 1.0 - t[1] - t[5] + t[9]
+  maxABCD = max(a, b, c, d)
+  if a == maxABCD
+    divTerm = 0.5 / sqrt(a)
+    b = t[6] - t[8]
+    c = t[7] - t[3]
+    d = t[2] - t[4]
+  elseif b == maxABCD
+    a = t[6] - t[8]
+    divTerm = 0.5 / sqrt(b)
+    c = t[2] + t[4]
+    d = t[7] + t[3]
+  elseif c == maxABCD
+    a = t[7] - t[3]
+    b = t[2] + t[4]
+    divTerm = 0.5 / sqrt(c)
+    d = t[6] + t[8]
+  else  # iMax == 4
+    a = t[2] - t[4]
+    b = t[7] + t[3]
+    c = t[6] + t[8]
+    divTerm = 0.5 / sqrt(d)
+  end
+  return Q(a * divTerm, b * divTerm, c * divTerm, d * divTerm)
 end
 
 function Base.getindex(q::Quat, i::Int)

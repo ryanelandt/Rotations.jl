@@ -23,8 +23,8 @@ end
 """
     angle_difference(a, b)
 
-Compute the difference between two angles in such a way that:
-* for angles `a` and `b` (in radians), and `c = angle_difference(a, b)`, `cos(a) ≈ cos(b + c)` and `sin(a) ≈ sin(b + c)`;
-* the result is in the interval [-π, π).
+Compute the angle difference `a - b` wrapped into the interval [-π, π) by subtracting or
+adding a multiple of 2π. This is the number `c` with the smallest absolute value such
+that `a` and `b + c` represent the same point on the circle, and likewise `b` and `a - c`.
 """
 angle_difference(a, b) = mod2pi(a - b + π) - π

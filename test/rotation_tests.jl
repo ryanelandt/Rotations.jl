@@ -34,7 +34,7 @@ macro contents_approx_eq_eps(a, b, eps)
 end
 
 
-# a macro to test if tow types are approximatey equal
+# a macro to test if two types are approximatey equal
 macro types_approx_eq(a, b)
     quote
         @test typeof($(esc(a))) == typeof($(esc(b)))
@@ -178,6 +178,24 @@ all_types = (RotMatrix{3}, Quat, SPQuat, AngleAxis, RodriguesVec,
         end
     end
 
+    #########################################################################
+    # Test robustness of DCM to Quat function
+    #########################################################################
+    function nearest_orthonormal(not_orthonormal)
+      # Didn't see a function like this already in Rotations
+      u,s,v = svd(not_orthonormal)
+      return u * diagm([1, 1, sign(det(u * v.'))]) * v.'
+    end
+
+    @testset "DCM to Quat" begin
+      pert = 1e-3
+      for type_rot in all_types
+        for _ = 1:100
+          not_orthonormal = rand(type_rot) + rand(3, 3) * pert
+          @test norm(Quat(not_orthonormal) - nearest_orthonormal(not_orthonormal)) < 10pert
+        end
+      end
+    end
 
     #########################################################################
     # Check angle and axis and inv work as expected

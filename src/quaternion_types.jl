@@ -43,7 +43,7 @@ end
 
 # These 3 functions are enough to satisfy the entire StaticArrays interface:
 function (::Type{Q})(t::NTuple{9}) where Q<:Quat
-  """
+  #=
   This function solves the system of equations in Section 3.1
   of https://arxiv.org/pdf/math/0701759.pdf. This cheap method
   only works for matrices that are already orthonormal (orthogonal
@@ -54,7 +54,7 @@ function (::Type{Q})(t::NTuple{9}) where Q<:Quat
   not_orthogonal = randn(3,3)
   u,s,v = svd(not_orthogonal)
   is_orthogoral = u * diagm([1, 1, sign(det(u * v.'))]) * v.'
-  """
+  =#
 
   a = 1 + t[1] + t[5] + t[9]
   b = 1 + t[1] - t[5] - t[9]

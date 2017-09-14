@@ -43,42 +43,42 @@ end
 
 # These 3 functions are enough to satisfy the entire StaticArrays interface:
 function (::Type{Q})(t::NTuple{9}) where Q<:Quat
-  #=
-  This function solves the system of equations in Section 3.1
-  of https://arxiv.org/pdf/math/0701759.pdf. This cheap method
-  only works for matrices that are already orthonormal (orthogonal
-  and unit length columns). The nearest orthonormal matrix can
-  be found by solving Wahba's problem:
-  https://en.wikipedia.org/wiki/Wahba%27s_problem as shown below.
+    #=
+    This function solves the system of equations in Section 3.1
+    of https://arxiv.org/pdf/math/0701759.pdf. This cheap method
+    only works for matrices that are already orthonormal (orthogonal
+    and unit length columns). The nearest orthonormal matrix can
+    be found by solving Wahba's problem:
+    https://en.wikipedia.org/wiki/Wahba%27s_problem as shown below.
 
-  not_orthogonal = randn(3,3)
-  u,s,v = svd(not_orthogonal)
-  is_orthogoral = u * diagm([1, 1, sign(det(u * v.'))]) * v.'
-  =#
+    not_orthogonal = randn(3,3)
+    u,s,v = svd(not_orthogonal)
+    is_orthogoral = u * diagm([1, 1, sign(det(u * v.'))]) * v.'
+    =#
 
-  a = 1 + t[1] + t[5] + t[9]
-  b = 1 + t[1] - t[5] - t[9]
-  c = 1 - t[1] + t[5] - t[9]
-  d = 1 - t[1] - t[5] + t[9]
-  max_abcd = max(a, b, c, d)
-  if a == max_abcd
-    b = t[6] - t[8]
-    c = t[7] - t[3]
-    d = t[2] - t[4]
-  elseif b == max_abcd
-    a = t[6] - t[8]
-    c = t[2] + t[4]
-    d = t[7] + t[3]
-  elseif c == max_abcd
-    a = t[7] - t[3]
-    b = t[2] + t[4]
-    d = t[6] + t[8]
-  else
-    a = t[2] - t[4]
-    b = t[7] + t[3]
-    c = t[6] + t[8]
-  end
-  return Q(a, b, c, d)
+    a = 1 + t[1] + t[5] + t[9]
+    b = 1 + t[1] - t[5] - t[9]
+    c = 1 - t[1] + t[5] - t[9]
+    d = 1 - t[1] - t[5] + t[9]
+    max_abcd = max(a, b, c, d)
+    if a == max_abcd
+        b = t[6] - t[8]
+        c = t[7] - t[3]
+        d = t[2] - t[4]
+    elseif b == max_abcd
+        a = t[6] - t[8]
+        c = t[2] + t[4]
+        d = t[7] + t[3]
+    elseif c == max_abcd
+        a = t[7] - t[3]
+        b = t[2] + t[4]
+        d = t[6] + t[8]
+    else
+        a = t[2] - t[4]
+        b = t[7] + t[3]
+        c = t[6] + t[8]
+    end
+    return Q(a, b, c, d)
 end
 
 

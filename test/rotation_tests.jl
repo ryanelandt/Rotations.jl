@@ -182,19 +182,18 @@ all_types = (RotMatrix{3}, Quat, SPQuat, AngleAxis, RodriguesVec,
     # Test robustness of DCM to Quat function
     #########################################################################
     function nearest_orthonormal(not_orthonormal)
-      # Didn't see a function like this already in Rotations
-      u,s,v = svd(not_orthonormal)
-      return u * diagm([1, 1, sign(det(u * v.'))]) * v.'
+        u,s,v = svd(not_orthonormal)
+        return u * diagm([1, 1, sign(det(u * v.'))]) * v.'
     end
 
     @testset "DCM to Quat" begin
-      pert = 1e-3
-      for type_rot in all_types
-        for _ = 1:100
-          not_orthonormal = rand(type_rot) + rand(3, 3) * pert
-          @test norm(Quat(not_orthonormal) - nearest_orthonormal(not_orthonormal)) < 10pert
+        pert = 1e-3
+        for type_rot in all_types
+            for _ = 1:100
+                not_orthonormal = rand(type_rot) + rand(3, 3) * pert
+                @test norm(Quat(not_orthonormal) - nearest_orthonormal(not_orthonormal)) < 10pert
+            end
         end
-      end
     end
 
     #########################################################################

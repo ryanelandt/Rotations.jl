@@ -46,7 +46,7 @@ end
 # These functions are enough to satisfy the entire StaticArrays interface:
 @inline (::Type{AA})(t::NTuple{9}) where {AA <: AngleAxis} = AA(Quat(t))
 @inline Base.getindex(aa::AngleAxis, i::Int) = Quat(aa)[i]
-@inline Tuple(aa::AngleAxis) = Tuple(Quat(aa))
+@inline Tuple(aa::AngleAxis) = Tuple(RotMatrix(aa))
 
 @inline function Base.convert(::Type{R}, aa::AngleAxis) where R <: RotMatrix
     # Rodrigues' rotation formula.

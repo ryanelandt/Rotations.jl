@@ -78,14 +78,14 @@ end
     theta_2 = aa.theta / 2
     c = cos(theta_2)
     s = sin(theta_2)
-    return Q(c, s * aa.axis_x, s * aa.axis_y, s * aa.axis_z)
+    return Q(c, s * aa.axis_x, s * aa.axis_y, s * aa.axis_z, false)
 end
 
 @inline function Base.convert(::Type{AA}, q::Quat) where AA <: AngleAxis
     # TODO: consider how to deal with derivative near theta = 0
     s = sqrt(q.x*q.x + q.y*q.y + q.z*q.z)
     theta =  2 * atan2(s, q.w)
-    return s > 0 ? AA(theta, q.x / s, q.y / s, q.z / s) : AA(theta, one(theta), zero(theta), zero(theta))
+    return s > 0 ? AA(theta, q.x / s, q.y / s, q.z / s, false) : AA(theta, one(theta), zero(theta), zero(theta), false)
 end
 
 # Using Rodrigues formula on an AngleAxis parameterization (assume unit axis length) to do the rotation
@@ -158,7 +158,7 @@ end
 function Base.convert(::Type{AA}, rv::RodriguesVec) where AA <: AngleAxis
     # TODO: consider how to deal with derivative near theta = 0. There should be a first-order expansion here.
     theta = rotation_angle(rv)
-    return theta > 0 ? AA(theta, rv.sx / theta, rv.sy / theta, rv.sz / theta) : AA(zero(theta), one(theta), zero(theta), zero(theta))
+    return theta > 0 ? AA(theta, rv.sx / theta, rv.sy / theta, rv.sz / theta, false) : AA(zero(theta), one(theta), zero(theta), zero(theta), false)
 end
 
 function Base.convert(::Type{RV}, aa::AngleAxis) where RV <: RodriguesVec
@@ -170,7 +170,7 @@ function Base.convert(::Type{Q}, rv::RodriguesVec) where Q <: Quat
     qtheta = cos(theta / 2)
     #s = abs(1/2 * sinc((theta / 2) / pi))
     s = (1/2 * sinc((theta / 2) / pi)) # TODO check this (I removed an abs)
-    return Q(qtheta, s * rv.sx, s * rv.sy, s * rv.sz)
+    return Q(qtheta, s * rv.sx, s * rv.sy, s * rv.sz, false)
 end
 
 function Base.convert(::Type{RV}, q::Quat) where RV <: RodriguesVec

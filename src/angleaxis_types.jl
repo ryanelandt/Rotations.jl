@@ -75,9 +75,10 @@ end
 end
 
 @inline function Base.convert(::Type{Q}, aa::AngleAxis) where Q <: Quat
-    qtheta = cos(aa.theta / 2)
-    s = sin(aa.theta / 2) / sqrt(aa.axis_x * aa.axis_x + aa.axis_y * aa.axis_y + aa.axis_z * aa.axis_z)
-    return Q(qtheta, s * aa.axis_x, s * aa.axis_y, s * aa.axis_z)
+    theta_2 = aa.theta / 2
+    c = cos(theta_2)
+    s = sin(theta_2)
+    return Q(c, s * aa.axis_x, s * aa.axis_y, s * aa.axis_z)
 end
 
 @inline function Base.convert(::Type{AA}, q::Quat) where AA <: AngleAxis

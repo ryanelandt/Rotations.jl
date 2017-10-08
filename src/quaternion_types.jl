@@ -262,8 +262,13 @@ end
 end
 
 @inline function Base.convert(::Type{SPQ}, q::Quat) where SPQ <: SPQuat
-    alpha2 = (1 - q.w) / (1 + q.w) # <= 1 since q.w >= 0
-    spq = SPQ(q.x * (alpha2 + 1)*0.5,  q.y * (alpha2 + 1)*0.5, q.z * (alpha2 + 1)*0.5)
+    # term = (alpha2 + 1) / 2
+    # term = ((1 - q.w) / (1 + q.w) + 1) / 2
+    # term = ((1 - q.w + (1 + q.w)) / (1 + q.w) / 2
+    # term = (2 / (1 + q.w)) / 2
+    # term = 1 / (1 + q.w)
+    term = 1 / (copysign(1, q.w) + q.w)  # incase q.w is not >= 0
+    spq = SPQ(q.x * term,  q.y * term, q.z * term)
 end
 
 @inline Base.:*(spq::SPQuat, x::StaticVector) = Quat(spq) * x

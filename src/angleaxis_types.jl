@@ -44,9 +44,9 @@ end
 end
 
 # These functions are enough to satisfy the entire StaticArrays interface:
-@inline (::Type{AA})(t::NTuple{9}) where {AA <: AngleAxis} = AA(Quat(t))
-@inline Base.getindex(aa::AngleAxis, i::Int) = Quat(aa)[i]
-@inline Tuple(aa::AngleAxis) = Tuple(RotMatrix(aa))
+@inline (::Type{AA})(t::NTuple{9}) where {AA <: AngleAxis} = convert(AA, Quat(t))
+@inline Base.getindex(aa::AngleAxis, i::Int) = convert(Quat, aa)[i]
+@inline Tuple(aa::AngleAxis) = Tuple(convert(RotMatrix, aa))
 
 @inline function Base.convert(::Type{R}, aa::AngleAxis) where R <: RotMatrix
     # Rodrigues' rotation formula.
@@ -148,9 +148,9 @@ end
 @inline (::Type{RodriguesVec})(x::X, y::Y, z::Z) where {X,Y,Z} = RodriguesVec{promote_type(promote_type(X, Y), Z)}(x, y, z)
 
 # These functions are enough to satisfy the entire StaticArrays interface:
-@inline (::Type{RV})(t::NTuple{9}) where {RV <: RodriguesVec} = RV(Quat(t))
-@inline Base.getindex(aa::RodriguesVec, i::Int) = Quat(aa)[i]
-@inline Tuple(rv::RodriguesVec) = Tuple(Quat(rv))
+@inline (::Type{RV})(t::NTuple{9}) where {RV <: RodriguesVec} = convert(RV, Quat(t))
+@inline Base.getindex(aa::RodriguesVec, i::Int) = convert(Quat, aa)[i]
+@inline Tuple(rv::RodriguesVec) = Tuple(convert(Quat, rv))
 
 # define its interaction with other angle representations
 @inline Base.convert(::Type{R}, rv::RodriguesVec) where {R <: RotMatrix} = convert(R, AngleAxis(rv))

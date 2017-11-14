@@ -76,6 +76,8 @@ Note: the orthonormality of the input matrix is *not* checked by the constructor
 struct RotMatrix{N,T,L} <: Rotation{N,T} # which is <: AbstractMatrix{T}
     mat::SMatrix{N, N, T, L} # The final parameter to SMatrix is the "length" of the matrix, 3 × 3 = 9
     RotMatrix{N,T,L}(x::AbstractArray) where {N,T,L} = new{N,T,L}(convert(SMatrix{N,N,T,L}, x))
+    # fixes #49 ambiguity introduced in StaticArrays 0.6.5
+    RotMatrix{N,T,L}(x::StaticArray) where {N,T,L} = new{N,T,L}(convert(SMatrix{N,N,T,L}, x))
 end
 RotMatrix(x::SMatrix{N,N,T,L}) where {N,T,L} = RotMatrix{N,T,L}(x)
 

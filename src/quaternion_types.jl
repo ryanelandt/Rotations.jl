@@ -252,9 +252,9 @@ end
 @inline convert(::Type{SPQ}, spq::SPQ) where {SPQ<:SPQuat} = spq
 
 # These functions are enough to satisfy the entire StaticArrays interface:
-@inline (::Type{SPQ})(t::NTuple{9}) where {SPQ <: SPQuat} = SPQ(Quat(t))
-@inline Base.getindex(spq::SPQuat, i::Int) = Quat(spq)[i]
-@inline Tuple(spq::SPQuat) = Tuple(Quat(spq))
+@inline (::Type{SPQ})(t::NTuple{9}) where {SPQ <: SPQuat} = convert(SPQ, Quat(t))
+@inline Base.getindex(spq::SPQuat, i::Int) = convert(Quat, spq)[i]
+@inline Tuple(spq::SPQuat) = Tuple(convert(Quat, spq))
 
 @inline function Base.convert(::Type{Q}, spq::SPQuat) where Q <: Quat
     # Both the sign and norm of the Quat is automatically dealt with in its inner constructor

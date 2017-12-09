@@ -135,7 +135,7 @@ j2 = Rotations.jacobian(q, p) # How does the rotated point q*p change w.r.t. the
     while those which repeat (e.g. `EulerXYX`) are said to use [**Proper Euler**](https://en.wikipedia.org/wiki/Euler_angles#Conventions) angle ordering.
 
     Like the two-angle versions, read the application of the rotations along the
-    static cardinal axes to a vector from right-to-left, so that `RotXYZ(x, y, z) * v == RotX(x) * (RotY(x) * (RotZ(z) * v))`.
+    static cardinal axes to a vector from right-to-left, so that `RotXYZ(x, y, z) * v == RotX(x) * (RotY(y) * (RotZ(z) * v))`.
     This is the "extrinsic" representation of an Euler-angle rotation, though
     if you prefer the "intrinsic" form it is easy to use the corresponding
     `RotZYX(z, y, x)`.

@@ -114,6 +114,13 @@ Base.inv(r::RotMatrix) = RotMatrix(r.mat')
 @inline *(r1::Rotation, r2::RotMatrix) = RotMatrix(r1) * r2
 @inline *(r1::RotMatrix, r2::RotMatrix) = RotMatrix(r1.mat * r2.mat) # TODO check that this doesn't involve extra copying.
 
+# Special case multiplication of 3×3 rotation matrices: speedup using cross product
+@inline function *(r1::RotMatrix{3}, r2::RotMatrix{3})
+    ret12 = r1 * r2[:, SVector(1, 2)]
+    ret3 = ret12[:, 1] × ret12[:, 2]
+    RotMatrix([ret12 ret3])
+end
+
 ################################################################################
 ################################################################################
 

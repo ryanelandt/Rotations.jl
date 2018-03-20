@@ -9,8 +9,8 @@ abstract type Rotation{N,T} <: StaticMatrix{N,N,T} end
 Base.@pure StaticArrays.Size(::Type{Rotation{N}}) where {N} = Size(N,N)
 Base.@pure StaticArrays.Size(::Type{Rotation{N,T}}) where {N,T} = Size(N,N)
 Base.@pure StaticArrays.Size(::Type{R}) where {R<:Rotation} = Size(supertype(R))
-Base.ctranspose(r::Rotation) = inv(r)
-Base.transpose(r::Rotation{N,T}) where {N,T<:Real} = inv(r)
+Compat.adjoint(r::Rotation) = inv(r)
+Compat.transpose(r::Rotation{N,T}) where {N,T<:Real} = inv(r)
 
 # Rotation angles and axes can be obtained by converting to the AngleAxis type
 rotation_angle(r::Rotation) = rotation_angle(AngleAxis(r))
@@ -102,11 +102,11 @@ Base.@propagate_inbounds Base.getindex(r::RotMatrix, i::Int) = r.mat[i]
 @inline (::Type{RotMatrix{2,T}})(θ::Real) where {T} = RotMatrix(@SMatrix T[cos(θ) -sin(θ); sin(θ) cos(θ)])
 
 # A rotation is more-or-less defined as being an orthogonal (or unitary) matrix
-Base.inv(r::RotMatrix) = RotMatrix(r.mat')
+inv(r::RotMatrix) = RotMatrix(r.mat')
 
 # A useful constructor for identity rotation (eye is already provided by StaticArrays, but needs an eltype)
-@inline Base.eye(::Type{RotMatrix{N}}) where {N} = RotMatrix((eye(SMatrix{N,N,Float64})))
-@inline Base.eye(::Type{RotMatrix{N,T}}) where {N,T} = RotMatrix((eye(SMatrix{N,N,T})))
+@inline eye(::Type{RotMatrix{N}}) where {N} = RotMatrix((eye(SMatrix{N,N,Float64})))
+@inline eye(::Type{RotMatrix{N,T}}) where {N,T} = RotMatrix((eye(SMatrix{N,N,T})))
 
 # By default, composition of rotations will go through RotMatrix, unless overridden
 @inline *(r1::Rotation, r2::Rotation) = RotMatrix(r1) * RotMatrix(r2)
@@ -150,32 +150,18 @@ function isrotation(r::AbstractMatrix{T}, tol::Real = 1000 * eps(eltype(T))) whe
     return d < tol
 end
 
-
-# A simplification and specialization of the Base.showarray() function makes
-# everything sensible at the REPL.
-function Base.showarray(io::IO, X::Rotation, repr::Bool = true; header = true)
-    if !haskey(io, :compact)
-        io = IOContext(io, compact=true)
-    end
-    if repr
-        if isa(X, RotMatrix)
-            Base.print_matrix_repr(io, X)
-        else
-            print(io, typeof(X).name.name)
-            n_fields = length(fieldnames(typeof(X)))
-            print(io, "(")
-            for i = 1:n_fields
-                print(io, getfield(X, i))
-                if i < n_fields
-                    print(io, ", ")
-                end
-            end
-            print(io, ")")
+@static if VERSION < v"0.7-"
+    # A simplification and specialization of the Base.showarray() function makes
+    # everything sensible at the REPL.
+    function Base.showarray(io::IO, X::Rotation, repr::Bool = true; header = true)
+        if !haskey(io, :compact)
+            io = IOContext(io, compact=true)
         end
-    else
-        if header
-            print(io, summary(X))
-            if !isa(X, RotMatrix)
+        if repr
+            if isa(X, RotMatrix)
+                Base.print_matrix_repr(io, X)
+            else
+                print(io, typeof(X).name.name)
                 n_fields = length(fieldnames(typeof(X)))
                 print(io, "(")
                 for i = 1:n_fields
@@ -186,10 +172,49 @@ function Base.showarray(io::IO, X::Rotation, repr::Bool = true; header = true)
                 end
                 print(io, ")")
             end
-            println(io, ":")
+        else
+            if header
+                print(io, summary(X))
+                if !isa(X, RotMatrix)
+                    n_fields = length(fieldnames(typeof(X)))
+                    print(io, "(")
+                    for i = 1:n_fields
+                        print(io, getfield(X, i))
+                        if i < n_fields
+                            print(io, ", ")
+                        end
+                    end
+                    print(io, ")")
+                end
+                println(io, ":")
+            end
+            punct = (" ", "  ", "")
+            Base.print_matrix(io, X, punct...)
         end
-        punct = (" ", "  ", "")
-        Base.print_matrix(io, X, punct...)
+    end
+else
+    # A simplification and specialization of the Base.show function for AbstractArray makes
+    # everything sensible at the REPL.
+    function Base.show(io::IO, ::MIME"text/plain", X::Rotation)
+        if !haskey(io, :compact)
+            io = IOContext(io, :compact => true)
+        end
+        summary(io, X)
+        if !isa(X, RotMatrix)
+            n_fields = length(fieldnames(typeof(X)))
+            print(io, "(")
+            for i = 1:n_fields
+                print(io, getfield(X, i))
+                if i < n_fields
+                    print(io, ", ")
+                end
+            end
+            print(io, ")")
+        end
+        print(io, ":")
+        println(io)
+        io = IOContext(io, :typeinfo => eltype(X))
+        Base.print_array(io, X)
     end
 end
 

@@ -40,7 +40,7 @@ q2 = rand(Quat)
 q3 = q * q2
 
 # Take the inverse (equivalent to transpose)
-q_inv = q'
+q_inv = transpose(q)
 q_inv == inv(q)
 p ≈ q_inv * (q * p)
 q4 = q3 / q2  # q4 = q3 * inv(q2)
@@ -102,7 +102,7 @@ j2 = Rotations.jacobian(q, p) # How does the rotated point q*p change w.r.t. the
 
 4. **Rodrigues Vector** `RodriguesVec{T}`
 
-    A 3D rotation encoded by an angle-axis representation as `angle * axis`.  
+    A 3D rotation encoded by an angle-axis representation as `angle * axis`.
     This type is used in packages such as [OpenCV](http://docs.opencv.org/2.4/modules/calib3d/doc/camera_calibration_and_3d_reconstruction.html#void%20Rodrigues%28InputArray%20src,%20OutputArray%20dst,%20OutputArray%20jacobian%29).
 
     Note: If you're differentiating a Rodrigues Vector check the result is what

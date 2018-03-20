@@ -53,7 +53,7 @@ function (::Type{Q})(t::NTuple{9}) where Q<:Quat
 
     not_orthogonal = randn(3,3)
     u,s,v = svd(not_orthogonal)
-    is_orthogoral = u * diagm([1, 1, sign(det(u * v.'))]) * v.'
+    is_orthogoral = u * diagm([1, 1, sign(det(u * transpose(v)))]) * transpose(v)
     =#
 
     a = 1 + t[1] + t[5] + t[9]
@@ -188,12 +188,12 @@ function Base.:*(q1::Quat, q2::Quat)
             q1.w*q2.z + q1.x*q2.y - q1.y*q2.x + q1.z*q2.w)
 end
 
-function Base.inv(q::Quat)
+function inv(q::Quat)
     Quat(q.w, -q.x, -q.y, -q.z)
 end
 
-@inline Base.eye(::Type{Quat}) = Quat(1.0, 0.0, 0.0, 0.0)
-@inline Base.eye(::Type{Quat{T}}) where {T} = Quat{T}(one(T), zero(T), zero(T), zero(T))
+@inline eye(::Type{Quat}) = Quat(1.0, 0.0, 0.0, 0.0)
+@inline eye(::Type{Quat{T}}) where {T} = Quat{T}(one(T), zero(T), zero(T), zero(T))
 
 """
     rotation_between(from, to)
@@ -274,10 +274,10 @@ end
 @inline Base.:*(r::RotMatrix, spq::SPQuat) = r * Quat(spq)
 @inline Base.:*(spq1::SPQuat, spq2::SPQuat) = Quat(spq1) * Quat(spq2)
 
-@inline Base.inv(spq::SPQuat) = SPQuat(-spq.x, -spq.y, -spq.z)
+@inline inv(spq::SPQuat) = SPQuat(-spq.x, -spq.y, -spq.z)
 
-@inline Base.eye(::Type{SPQuat}) = SPQuat(0.0, 0.0, 0.0)
-@inline Base.eye(::Type{SPQuat{T}}) where {T} = SPQuat{T}(zero(T), zero(T), zero(T))
+@inline eye(::Type{SPQuat}) = SPQuat(0.0, 0.0, 0.0)
+@inline eye(::Type{SPQuat{T}}) where {T} = SPQuat{T}(zero(T), zero(T), zero(T))
 
 # rotation properties
 @inline rotation_angle(spq::SPQuat) = rotation_angle(Quat(spq))

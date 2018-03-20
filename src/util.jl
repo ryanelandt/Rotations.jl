@@ -10,9 +10,9 @@ function perpendicular_vector(vec::SVector{3})
 
     # find indices of the two elements of vec with the largest absolute values:
     absvec = abs.(vec)
-    ind1 = indmax(absvec) # index of largest element
+    ind1 = argmax(absvec) # index of largest element
     @inbounds absvec2 = @SVector [ifelse(i == ind1, typemin(T), absvec[i]) for i = 1 : 3] # set largest element to typemin(T)
-    ind2 = indmax(absvec2) # index of second-largest element
+    ind2 = argmax(absvec2) # index of second-largest element
 
     # perp[ind1] = -vec[ind2], perp[ind2] = vec[ind1], set remaining element to zero:
     @inbounds perpind1 = -vec[ind2]

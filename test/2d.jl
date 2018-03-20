@@ -1,4 +1,4 @@
-using Rotations, StaticArrays, Base.Test
+using Rotations, StaticArrays, Compat.Test
 
 @testset "2d Rotations" begin
 
@@ -38,8 +38,8 @@ using Rotations, StaticArrays, Base.Test
         for i = 1:repeats
             r = rand(R)
             @test isrotation(r)
-            @test inv(r) == r'
-            @test inv(r) == r.'
+            @test inv(r) == adjoint(r)
+            @test inv(r) == transpose(r)
             @test inv(r)*r ≈ I
             @test r*inv(r) ≈ I
         end
@@ -119,6 +119,11 @@ using Rotations, StaticArrays, Base.Test
         show(io, MIME("text/plain"), r)
         str = String(take!(io))
         @test startswith(str, "2×2 RotMatrix{Float64}:")
+
+        rxyz = RotXYZ(1.0, 2.0, 3.0)
+        show(io, MIME("text/plain"), rxyz)
+        str = String(take!(io))
+        @test startswith(str, "3×3 RotXYZ{Float64}(1.0, 2.0, 3.0):")
     end
 end
 

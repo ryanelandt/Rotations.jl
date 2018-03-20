@@ -108,8 +108,8 @@ all_types = (RotMatrix{3}, Quat, SPQuat, AngleAxis, RodriguesVec,
             srand(0)
             for i = 1:repeats
                 r = rand(R)
-                @test inv(r) == r'
-                @test inv(r) == r.'
+                @test inv(r) == adjoint(r)
+                @test inv(r) == transpose(r)
                 @test inv(r)*r ≈ I
                 @test r*inv(r) ≈ I
             end
@@ -183,7 +183,7 @@ all_types = (RotMatrix{3}, Quat, SPQuat, AngleAxis, RodriguesVec,
     #########################################################################
     function nearest_orthonormal(not_orthonormal)
         u,s,v = svd(not_orthonormal)
-        return u * diagm([1, 1, sign(det(u * v.'))]) * v.'
+        return u * diagm([1, 1, sign(det(u * transpose(v)))]) * transpose(v)
     end
 
     @testset "DCM to Quat" begin

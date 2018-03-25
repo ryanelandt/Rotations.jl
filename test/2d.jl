@@ -112,19 +112,6 @@ using Rotations, StaticArrays, Compat.Test
             @test R * R ≈ T[0 -1; 1 0]
         end
     end
-
-    @testset "show" begin
-        io = IOBuffer()
-        r = rand(RotMatrix{2})
-        show(io, MIME("text/plain"), r)
-        str = String(take!(io))
-        @test startswith(str, "2×2 RotMatrix{Float64}:")
-
-        rxyz = RotXYZ(1.0, 2.0, 3.0)
-        show(io, MIME("text/plain"), rxyz)
-        str = String(take!(io))
-        @test startswith(str, "3×3 RotXYZ{Float64}(1.0, 2.0, 3.0):")
-    end
 end
 
 nothing

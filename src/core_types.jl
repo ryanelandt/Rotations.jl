@@ -220,5 +220,7 @@ end
 
 # Removes module name from output, to match other types
 function Base.summary(r::Rotation{N,T}) where {T,N}
-    "$N×$N $(typeof(r).name.name){$(eltype(r))}"
+    inds = indices(r)
+    typestring = last(split(string(typeof(r)), '.'; limit = 2))
+    string(Base.dims2string(length.(inds)), " ", typestring)
 end

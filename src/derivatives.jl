@@ -66,7 +66,7 @@ function jacobian(::Type{RotMatrix},  q::Quat)
     #          = (dR(s*q)/dQ*s - s*R(q) * ds/dQ) / s^2
     #          = (dR(s*q)/dQ   - R(q) * ds/dQ) / s
 
-    jac = dsRdQ - R * dsdQ.'
+    jac = dsRdQ - R * transpose(dsdQ)
 
     # now reformat for output.  TODO: is the the best expression?
     # return Vec{4,Mat{3,3,T}}(ith_partial(jac, 1), ith_partial(jac, 2), ith_partial(jac, 3), ith_partial(jac, 4))
@@ -198,7 +198,7 @@ function jacobian(q::Quat, X::AbstractVector)
 
     # and finalize with the quotient rule
     Xo = q * X           # N.B. g(x) = s * Xo, with dG/dx = dRdQs
-    Xom = Xo * dSdQ.'
+    Xom = Xo * transpose(dSdQ)
     return dRdQs -  Xom
 end
 

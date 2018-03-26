@@ -108,8 +108,8 @@ all_types = (RotMatrix{3}, Quat, SPQuat, AngleAxis, RodriguesVec,
             srand(0)
             for i = 1:repeats
                 r = rand(R)
-                @test inv(r) == r'
-                @test inv(r) == r.'
+                @test inv(r) == adjoint(r)
+                @test inv(r) == transpose(r)
                 @test inv(r)*r ≈ I
                 @test r*inv(r) ≈ I
             end
@@ -183,7 +183,7 @@ all_types = (RotMatrix{3}, Quat, SPQuat, AngleAxis, RodriguesVec,
     #########################################################################
     function nearest_orthonormal(not_orthonormal)
         u,s,v = svd(not_orthonormal)
-        return u * diagm([1, 1, sign(det(u * v.'))]) * v.'
+        return u * Diagonal([1, 1, sign(det(u * transpose(v)))]) * transpose(v)
     end
 
     @testset "DCM to Quat" begin
@@ -301,5 +301,18 @@ all_types = (RotMatrix{3}, Quat, SPQuat, AngleAxis, RodriguesVec,
     @testset "Testing RotMatrix conversion to Tuple" begin
         rot = eye(RotMatrix{3, Float64})
         @inferred Tuple(rot)
+    end
+
+    @testset "Testing show" begin
+        io = IOBuffer()
+        r = rand(RotMatrix{2})
+        show(io, MIME("text/plain"), r)
+        str = String(take!(io))
+        @test startswith(str, "2×2 RotMatrix{2,Float64,4}:")
+
+        rxyz = RotXYZ(1.0, 2.0, 3.0)
+        show(io, MIME("text/plain"), rxyz)
+        str = String(take!(io))
+        @test startswith(str, "3×3 RotXYZ{Float64}(1.0, 2.0, 3.0):")
     end
 end

@@ -3,9 +3,12 @@ __precompile__(true)
 
 module Rotations
 
+using Compat
+using Compat.LinearAlgebra
 using StaticArrays
 
-import Base: convert, eltype, size, length, getindex, inv, *, Tuple, eye
+import Base: convert, eltype, size, length, getindex, *, Tuple
+import Compat.LinearAlgebra: inv, eye
 
 include("util.jl")
 include("core_types.jl")

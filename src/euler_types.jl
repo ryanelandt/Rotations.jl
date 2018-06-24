@@ -582,12 +582,12 @@ RotXYX
 @inline function (::Type{Rot})(t::NTuple{9}) where Rot <: RotXYX
     R = SMatrix{3,3}(t)
 
-    t1 = atan2(R[2, 1], (-R[3, 1] + eps(t[1])) - eps(t[1]))  # TODO: handle denormal numbers better, as atan2(0,0) != atan2(0,-0)
+    t1 = atan(R[2, 1], (-R[3, 1] + eps(t[1])) - eps(t[1]))  # TODO: handle denormal numbers better, as atan(0,0) != atan(0,-0)
     ct1, st1 = cos(t1), sin(t1)
 
     Rot(t1,
-        atan2((R[1, 2] * R[1, 2] + R[1, 3] * R[1, 3])^(1/2), R[1, 1]),
-        atan2(- R[2, 3]*ct1 - R[3, 3]*st1, R[2, 2]*ct1 + R[3, 2]*st1))
+        atan((R[1, 2] * R[1, 2] + R[1, 3] * R[1, 3])^(1/2), R[1, 1]),
+        atan(- R[2, 3]*ct1 - R[3, 3]*st1, R[2, 2]*ct1 + R[3, 2]*st1))
 end
 
 @inline function Base.convert(::Type{Tuple}, r::RotXYX{T}) where T
@@ -639,12 +639,12 @@ RotXZX
 @inline function (::Type{Rot})(t::NTuple{9}) where Rot <: RotXZX
     R = SMatrix{3,3}(t)
 
-    t1 = atan2(R[3, 1], R[2, 1])
+    t1 = atan(R[3, 1], R[2, 1])
     ct1, st1 = cos(t1), sin(t1)
 
     Rot(t1,
-        atan2((R[1, 2] * R[1, 2] + R[1, 3] * R[1, 3])^(1/2), R[1, 1]),
-        atan2(R[3, 2]*ct1 - R[2, 2]*st1, R[3, 3]*ct1 - R[2, 3]*st1))
+        atan((R[1, 2] * R[1, 2] + R[1, 3] * R[1, 3])^(1/2), R[1, 1]),
+        atan(R[3, 2]*ct1 - R[2, 2]*st1, R[3, 3]*ct1 - R[2, 3]*st1))
 end
 
 @inline function Base.convert(::Type{Tuple}, r::RotXZX{T}) where T
@@ -696,12 +696,12 @@ RotYXY
 @inline function (::Type{Rot})(t::NTuple{9}) where Rot <: RotYXY
     R = SMatrix{3,3}(t)
 
-    t1 = atan2(R[1, 2], R[3, 2])
+    t1 = atan(R[1, 2], R[3, 2])
     ct1, st1 = cos(t1), sin(t1)
 
     Rot(t1,
-        atan2((R[2, 1] * R[2, 1] + R[2, 3] * R[2, 3])^(1/2), R[2, 2]),
-        atan2(R[1, 3]*ct1 - R[3, 3]*st1, R[1, 1]*ct1 - R[3, 1]*st1))
+        atan((R[2, 1] * R[2, 1] + R[2, 3] * R[2, 3])^(1/2), R[2, 2]),
+        atan(R[1, 3]*ct1 - R[3, 3]*st1, R[1, 1]*ct1 - R[3, 1]*st1))
 end
 
 @inline function Base.convert(::Type{Tuple}, r::RotYXY{T}) where T
@@ -753,12 +753,12 @@ RotYZY
 @inline function (::Type{Rot})(t::NTuple{9}) where Rot <: RotYZY
     R = SMatrix{3,3}(t)
 
-    t1 = atan2(R[3, 2], -R[1, 2])  # TODO: handle denormal numbers better, as atan2(0,0) != atan2(0,-0)
+    t1 = atan(R[3, 2], -R[1, 2])  # TODO: handle denormal numbers better, as atan(0,0) != atan(0,-0)
     ct1, st1 = cos(t1), sin(t1)
 
     Rot(t1,
-        atan2((R[2, 1] * R[2, 1] + R[2, 3] * R[2, 3])^(1/2), R[2, 2]),
-        atan2(- R[3, 1]*ct1 - R[1, 1]*st1, R[3, 3]*ct1 + R[1, 3]*st1))
+        atan((R[2, 1] * R[2, 1] + R[2, 3] * R[2, 3])^(1/2), R[2, 2]),
+        atan(- R[3, 1]*ct1 - R[1, 1]*st1, R[3, 3]*ct1 + R[1, 3]*st1))
 end
 
 @inline function Base.convert(::Type{Tuple}, r::RotYZY{T}) where T
@@ -810,12 +810,12 @@ RotZXZ
 @inline function (::Type{Rot})(t::NTuple{9}) where Rot <: RotZXZ
     R = SMatrix{3,3}(t)
 
-    t1 = atan2(R[1, 3], (-R[2, 3] + eps()) - eps())  # TODO: handle denormal numbers better, as atan2(0,0) != atan2(0,-0)
+    t1 = atan(R[1, 3], (-R[2, 3] + eps()) - eps())  # TODO: handle denormal numbers better, as atan(0,0) != atan(0,-0)
     ct1, st1 = cos(t1), sin(t1)
 
     Rot(t1,
-        atan2((R[3, 1] * R[3, 1] + R[3, 2] * R[3, 2])^(1/2), R[3, 3]),
-        atan2(- R[1, 2]*ct1 - R[2, 2]*st1, R[1, 1]*ct1 + R[2, 1]*st1))
+        atan((R[3, 1] * R[3, 1] + R[3, 2] * R[3, 2])^(1/2), R[3, 3]),
+        atan(- R[1, 2]*ct1 - R[2, 2]*st1, R[1, 1]*ct1 + R[2, 1]*st1))
 end
 
 @inline function Base.convert(::Type{Tuple}, r::RotZXZ{T}) where T
@@ -867,12 +867,12 @@ RotZYZ
 @inline function (::Type{Rot})(t::NTuple{9}) where Rot <: RotZYZ
     R = SMatrix{3,3}(t)
 
-    t1 = atan2(R[2, 3], R[1, 3])
+    t1 = atan(R[2, 3], R[1, 3])
     ct1, st1 = cos(t1), sin(t1)
 
     Rot(t1,
-        atan2((R[3, 1] * R[3, 1] + R[3, 2] * R[3, 2])^(1/2), R[3, 3]),
-        atan2(R[2, 1]*ct1 - R[1, 1]*st1, R[2, 2]*ct1 - R[1, 2]*st1))
+        atan((R[3, 1] * R[3, 1] + R[3, 2] * R[3, 2])^(1/2), R[3, 3]),
+        atan(R[2, 1]*ct1 - R[1, 1]*st1, R[2, 2]*ct1 - R[1, 2]*st1))
 end
 
 @inline function Base.convert(::Type{Tuple}, r::RotZYZ{T}) where T
@@ -934,12 +934,12 @@ RotXYZ
 @inline function (::Type{Rot})(t::NTuple{9}) where Rot <: RotXYZ
     R = SMatrix{3,3}(t)
 
-    t1 = atan2(-R[2, 3], R[3, 3])
+    t1 = atan(-R[2, 3], R[3, 3])
     ct1, st1 = cos(t1), sin(t1)
 
     Rot(t1,
-        atan2(R[1, 3], (R[1, 1] * R[1, 1] + R[1, 2] * R[1, 2])^(1/2)),
-        atan2(R[2, 1]*ct1 + R[3, 1]*st1, R[2, 2]*ct1 + R[3, 2]*st1))
+        atan(R[1, 3], (R[1, 1] * R[1, 1] + R[1, 2] * R[1, 2])^(1/2)),
+        atan(R[2, 1]*ct1 + R[3, 1]*st1, R[2, 2]*ct1 + R[3, 2]*st1))
 end
 
 @inline function Base.convert(::Type{Tuple}, r::RotXYZ{T}) where T
@@ -998,12 +998,12 @@ RotZYX
 @inline function (::Type{Rot})(t::NTuple{9}) where Rot <: RotZYX
     R = SMatrix{3,3}(t)
 
-    t1 = atan2(R[2, 1], R[1, 1])
+    t1 = atan(R[2, 1], R[1, 1])
     ct1, st1 = cos(t1), sin(t1)
 
     Rot(t1,
-        atan2(-R[3, 1], (R[3, 2] * R[3, 2] + R[3, 3] * R[3, 3])^(1/2)),
-        atan2(R[1, 3]*st1 - R[2, 3]*ct1, R[2, 2]*ct1 - R[1, 2]*st1))
+        atan(-R[3, 1], (R[3, 2] * R[3, 2] + R[3, 3] * R[3, 3])^(1/2)),
+        atan(R[1, 3]*st1 - R[2, 3]*ct1, R[2, 2]*ct1 - R[1, 2]*st1))
 end
 
 @inline function Base.convert(::Type{Tuple}, r::RotZYX{T}) where T
@@ -1062,12 +1062,12 @@ RotXZY
 @inline function (::Type{Rot})(t::NTuple{9}) where Rot <: RotXZY
     R = SMatrix{3,3}(t)
 
-    t1 = atan2(R[3, 2], R[2, 2])
+    t1 = atan(R[3, 2], R[2, 2])
     ct1, st1 = cos(t1), sin(t1)
 
     Rot(t1,
-        atan2(-R[1, 2], (R[1, 1] * R[1, 1] + R[1, 3] * R[1, 3])^(1/2)),
-        atan2(R[2, 1]*st1 - R[3, 1]*ct1, R[3, 3]*ct1 - R[2, 3]*st1))
+        atan(-R[1, 2], (R[1, 1] * R[1, 1] + R[1, 3] * R[1, 3])^(1/2)),
+        atan(R[2, 1]*st1 - R[3, 1]*ct1, R[3, 3]*ct1 - R[2, 3]*st1))
 end
 
 @inline function Base.convert(::Type{Tuple}, r::RotXZY{T}) where T
@@ -1126,12 +1126,12 @@ RotYZX
 @inline function (::Type{Rot})(t::NTuple{9}) where Rot <: RotYZX
     R = SMatrix{3,3}(t)
 
-    t1 = atan2(-R[3, 1], R[1, 1])
+    t1 = atan(-R[3, 1], R[1, 1])
     ct1, st1 = cos(t1), sin(t1)
 
     Rot(t1,
-        atan2(R[2, 1], (R[2, 2] * R[2, 2] + R[2, 3] * R[2, 3])^(1/2)),
-        atan2(R[3, 2]*ct1 + R[1, 2]*st1, R[3, 3]*ct1 + R[1, 3]*st1))
+        atan(R[2, 1], (R[2, 2] * R[2, 2] + R[2, 3] * R[2, 3])^(1/2)),
+        atan(R[3, 2]*ct1 + R[1, 2]*st1, R[3, 3]*ct1 + R[1, 3]*st1))
 end
 
 @inline function Base.convert(::Type{Tuple}, r::RotYZX{T}) where T
@@ -1190,12 +1190,12 @@ RotYXZ
 @inline function (::Type{Rot})(t::NTuple{9}) where Rot <: RotYXZ
     R = SMatrix{3,3}(t)
 
-    t1 = atan2(R[1, 3], R[3, 3])
+    t1 = atan(R[1, 3], R[3, 3])
     ct1, st1 = cos(t1), sin(t1)
 
     Rot(t1,
-        atan2(-R[2, 3], (R[2, 1] * R[2, 1] + R[2, 2] * R[2, 2])^(1/2)),
-        atan2(R[3, 2]*st1 - R[1, 2]*ct1, R[1, 1]*ct1 - R[3, 1]*st1))
+        atan(-R[2, 3], (R[2, 1] * R[2, 1] + R[2, 2] * R[2, 2])^(1/2)),
+        atan(R[3, 2]*st1 - R[1, 2]*ct1, R[1, 1]*ct1 - R[3, 1]*st1))
 end
 
 @inline function Base.convert(::Type{Tuple}, r::RotYXZ{T}) where T
@@ -1254,12 +1254,12 @@ RotZXY
 @inline function (::Type{Rot})(t::NTuple{9}) where Rot <: RotZXY
     R = SMatrix{3,3}(t)
 
-    t1 = atan2(-R[1, 2], R[2, 2])
+    t1 = atan(-R[1, 2], R[2, 2])
     ct1, st1 = cos(t1), sin(t1)
 
     Rot(t1,
-        atan2(R[3, 2], (R[3, 1] * R[3, 1] + R[3, 3] * R[3, 3])^(1/2)),
-        atan2(R[1, 3]*ct1 + R[2, 3]*st1, R[1, 1]*ct1 + R[2, 1]*st1))
+        atan(R[3, 2], (R[3, 1] * R[3, 1] + R[3, 3] * R[3, 3])^(1/2)),
+        atan(R[1, 3]*ct1 + R[2, 3]*st1, R[1, 1]*ct1 + R[2, 1]*st1))
 end
 
 @inline function Base.convert(::Type{Tuple}, r::RotZXY{T}) where T

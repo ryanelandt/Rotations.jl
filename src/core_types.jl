@@ -87,19 +87,19 @@ for N = 2:3
     L = N*N
     RotMatrixN = Symbol(:RotMatrix, N)
     @eval begin
-        @inline (::Type{RotMatrix})(t::NTuple{$L})  = RotMatrix(SMatrix{$N,$N}(t))
+        @inline RotMatrix(t::NTuple{$L})  = RotMatrix(SMatrix{$N,$N}(t))
         @inline (::Type{RotMatrix{$N}})(t::NTuple{$L}) = RotMatrix(SMatrix{$N,$N}(t))
-        @inline (::Type{RotMatrix{$N,T}})(t::NTuple{$L}) where {T} = RotMatrix(SMatrix{$N,$N,T}(t))
-        @inline (::Type{RotMatrix{$N,T,$L}})(t::NTuple{$L}) where {T} = RotMatrix(SMatrix{$N,$N,T}(t))
+        @inline RotMatrix{$N,T}(t::NTuple{$L}) where {T} = RotMatrix(SMatrix{$N,$N,T}(t))
+        @inline RotMatrix{$N,T,$L}(t::NTuple{$L}) where {T} = RotMatrix(SMatrix{$N,$N,T}(t))
         const $RotMatrixN{T} = RotMatrix{$N, T, $L}
     end
 end
 Base.@propagate_inbounds Base.getindex(r::RotMatrix, i::Int) = r.mat[i]
 @inline Tuple(r::RotMatrix) = Tuple(r.mat)
 
-@inline (::Type{RotMatrix})(θ::Real) = RotMatrix(@SMatrix [cos(θ) -sin(θ); sin(θ) cos(θ)])
+@inline RotMatrix(θ::Real) = RotMatrix(@SMatrix [cos(θ) -sin(θ); sin(θ) cos(θ)])
 @inline (::Type{RotMatrix{2}})(θ::Real)      = RotMatrix(@SMatrix [cos(θ) -sin(θ); sin(θ) cos(θ)])
-@inline (::Type{RotMatrix{2,T}})(θ::Real) where {T} = RotMatrix(@SMatrix T[cos(θ) -sin(θ); sin(θ) cos(θ)])
+@inline RotMatrix{2,T}(θ::Real) where {T} = RotMatrix(@SMatrix T[cos(θ) -sin(θ); sin(θ) cos(θ)])
 
 # A rotation is more-or-less defined as being an orthogonal (or unitary) matrix
 inv(r::RotMatrix) = RotMatrix(r.mat')

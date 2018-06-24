@@ -83,7 +83,7 @@ using Rotations, StaticArrays, Compat.Test
             m2 = SMatrix(r2)
 
             @test r1*r2 ≈ m1*m2
-            θ1, θ2 = atan2(r1[2,1],r1[1,1]), atan2(r2[2,1],r2[1,1])
+            θ1, θ2 = atan(r1[2,1],r1[1,1]), atan(r2[2,1],r2[1,1])
             @test r1*r2 ≈ RotMatrix(θ1+θ2)
             @test r1/r2 ≈ RotMatrix(θ1-θ2)
             @test r1\r2 ≈ RotMatrix(θ2-θ1)

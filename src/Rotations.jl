@@ -10,6 +10,12 @@ using StaticArrays
 import Base: convert, eltype, size, length, getindex, *, Tuple
 import Compat.LinearAlgebra: inv, eye
 
+if VERSION >= v"0.7.0-beta.85"
+    import Statistics: mean
+else
+    import Base: mean
+end
+
 include("util.jl")
 include("core_types.jl")
 include("quaternion_types.jl")

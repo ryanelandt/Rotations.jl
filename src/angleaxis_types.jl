@@ -119,8 +119,16 @@ end
 
 
 # define null rotations for convenience
-@inline eye(::Type{AngleAxis}) = AngleAxis(0.0, 1.0, 0.0, 0.0)
-@inline eye(::Type{AngleAxis{T}}) where {T} = AngleAxis{T}(zero(T), one(T), zero(T), zero(T))
+@inline Base.one(::Type{AngleAxis}) = AngleAxis(0.0, 1.0, 0.0, 0.0)
+@inline Base.one(::Type{AngleAxis{T}}) where {T} = AngleAxis{T}(zero(T), one(T), zero(T), zero(T))
+
+if VERSION < v"0.7-"
+    eye(::Type{AngleAxis}) = one(AngleAxis)
+    eye(::Type{AngleAxis{T}}) where {T} = one(AngleAxis{T})
+elseif isdefined(LinearAlgebra, :eye)
+    Base.@deprecate eye(::Type{AngleAxis}) one(AngleAxis)
+    Base.@deprecate eye(::Type{AngleAxis{T}}) where {T} one(AngleAxis{T})
+end
 
 # accessors
 @inline rotation_angle(aa::AngleAxis) = aa.theta #  - floor((aa.theta+pi) / (2*pi)) * 2*pi
@@ -223,5 +231,13 @@ function rotation_axis(rv::RodriguesVec)     # what should this return for theta
 end
 
 # define null rotations for convenience
-@inline eye(::Type{RodriguesVec}) = RodriguesVec(0.0, 0.0, 0.0)
-@inline eye(::Type{RodriguesVec{T}}) where {T} = RodriguesVec{T}(zero(T), zero(T), zero(T))
+@inline Base.one(::Type{RodriguesVec}) = RodriguesVec(0.0, 0.0, 0.0)
+@inline Base.one(::Type{RodriguesVec{T}}) where {T} = RodriguesVec{T}(zero(T), zero(T), zero(T))
+
+if VERSION < v"0.7-"
+    eye(::Type{RodriguesVec}) = one(RodriguesVec)
+    eye(::Type{RodriguesVec{T}}) where {T} = one(RodriguesVec{T})
+elseif isdefined(LinearAlgebra, :eye)
+    Base.@deprecate eye(::Type{RodriguesVec}) one(RodriguesVec)
+    Base.@deprecate eye(::Type{RodriguesVec{T}}) where {T} one(RodriguesVec{T})
+end

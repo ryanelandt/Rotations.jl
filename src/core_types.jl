@@ -104,9 +104,13 @@ Base.@propagate_inbounds Base.getindex(r::RotMatrix, i::Int) = r.mat[i]
 # A rotation is more-or-less defined as being an orthogonal (or unitary) matrix
 inv(r::RotMatrix) = RotMatrix(r.mat')
 
-# A useful constructor for identity rotation (eye is already provided by StaticArrays, but needs an eltype)
-@inline eye(::Type{RotMatrix{N}}) where {N} = RotMatrix((eye(SMatrix{N,N,Float64})))
-@inline eye(::Type{RotMatrix{N,T}}) where {N,T} = RotMatrix((eye(SMatrix{N,N,T})))
+if VERSION < v"0.7-"
+    eye(::Type{RotMatrix{N}}) where {N} = one(RotMatrix{N})
+    eye(::Type{RotMatrix{N,T}}) where {N,T} = one(RotMatrix{N,T})
+elseif isdefined(LinearAlgebra, :eye)
+    Base.@deprecate eye(::Type{RotMatrix{N}}) where {N} one(RotMatrix{N})
+    Base.@deprecate eye(::Type{RotMatrix{N,T}}) where {N,T} one(RotMatrix{N,T})
+end
 
 # By default, composition of rotations will go through RotMatrix, unless overridden
 @inline *(r1::Rotation, r2::Rotation) = RotMatrix(r1) * RotMatrix(r2)

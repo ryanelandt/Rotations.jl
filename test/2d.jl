@@ -7,7 +7,7 @@ using Rotations, StaticArrays, Compat.Test
     #################################
 
     @testset "Core" begin
-        r = eye(RotMatrix{2,Float32})
+        r = one(RotMatrix{2,Float32})
         @test RotMatrix((1,0,0,1)) == RotMatrix(@SMatrix [1 0; 0 1])
         @test_throws ErrorException RotMatrix((1,0,0,1,0))
     end
@@ -17,13 +17,13 @@ using Rotations, StaticArrays, Compat.Test
     ###############################
 
     @testset "Identity rotation checks" begin
-        I = eye(SMatrix{2,2,Float64})
-        I32 = eye(SMatrix{2,2,Float32})
+        I = one(SMatrix{2,2,Float64})
+        I32 = one(SMatrix{2,2,Float32})
         R = RotMatrix{2}
         @test @inferred(size(R)) == (2,2)
         @test @inferred(size(R{Float32})) == (2,2)
-        @test eye(R)::R == I
-        @test eye(R{Float32})::R{Float32} == I32
+        @test one(R)::R == I
+        @test one(R{Float32})::R{Float32} == I32
     end
 
     ################################
@@ -33,7 +33,7 @@ using Rotations, StaticArrays, Compat.Test
     @testset "Testing inverse()" begin
         repeats = 100
         R = RotMatrix{2,Float64}
-        I = eye(R)
+        I = one(R)
         srand(0)
         for i = 1:repeats
             r = rand(R)

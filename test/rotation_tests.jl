@@ -89,11 +89,11 @@ all_types = (RotMatrix{3}, Quat, SPQuat, AngleAxis, RodriguesVec,
     ###############################
 
     @testset "Identity rotation checks" begin
-        I = eye(SMatrix{3,3,Float64})
-        I32 = eye(SMatrix{3,3,Float32})
+        I = one(SMatrix{3,3,Float64})
+        I32 = one(SMatrix{3,3,Float32})
         @testset "$(R)" for R in all_types
-            @test eye(R)::R == I
-            @test eye(R{Float32})::R{Float32} == I32
+            @test one(R)::R == I
+            @test one(R{Float32})::R{Float32} == I32
         end
     end
 
@@ -103,7 +103,7 @@ all_types = (RotMatrix{3}, Quat, SPQuat, AngleAxis, RodriguesVec,
 
     @testset "Testing inverse()" begin
         repeats = 100
-        I = eye(RotMatrix{3,Float64})
+        I = one(RotMatrix{3,Float64})
         @testset "$(R)" for R in all_types
             srand(0)
             for i = 1:repeats
@@ -280,8 +280,8 @@ all_types = (RotMatrix{3}, Quat, SPQuat, AngleAxis, RodriguesVec,
     end
 
     @testset "Testing type aliases" begin
-        @test eye(RotMatrix{2, Float64}) isa RotMatrix2{Float64}
-        @test eye(RotMatrix{3, Float64}) isa RotMatrix3{Float64}
+        @test one(RotMatrix{2, Float64}) isa RotMatrix2{Float64}
+        @test one(RotMatrix{3, Float64}) isa RotMatrix3{Float64}
     end
 
     @testset "Testing normalization" begin
@@ -299,7 +299,7 @@ all_types = (RotMatrix{3}, Quat, SPQuat, AngleAxis, RodriguesVec,
     end
 
     @testset "Testing RotMatrix conversion to Tuple" begin
-        rot = eye(RotMatrix{3, Float64})
+        rot = one(RotMatrix{3, Float64})
         @inferred Tuple(rot)
     end
 

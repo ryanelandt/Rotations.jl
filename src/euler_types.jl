@@ -31,8 +31,19 @@ for axis in [:X, :Y, :Z]
         @inline inv(r::$RotType) = $RotType(-r.theta)
 
         # define null rotations for convenience
-        @inline eye(::Type{$RotType}) = $RotType(0.0)
-        @inline eye(::Type{$RotType{T}}) where {T} = $RotType{T}(zero(T))
+        @inline one(::Type{$RotType}) = $RotType(0.0)
+        @inline one(::Type{$RotType{T}}) where {T} = $RotType{T}(zero(T))
+    end
+    if VERSION < v"0.7-"
+        @eval begin
+            eye(::Type{$RotType}) = one($RotType)
+            eye(::Type{$RotType{T}}) where {T} = one($RotType{T})
+        end
+    elseif isdefined(LinearAlgebra, :eye)
+        @eval begin
+            Base.@deprecate eye(::Type{$RotType}) one($RotType)
+            Base.@deprecate eye(::Type{$RotType{T}}) where {T} one($RotType{T})
+        end
     end
 end
 
@@ -247,8 +258,19 @@ for axis1 in [:X, :Y, :Z]
             @inline inv(r::$RotType) = $InvRotType(-r.theta2, -r.theta1)
 
             # define null rotations for convenience
-            @inline eye(::Type{$RotType}) = $RotType(0.0, 0.0)
-            @inline eye(::Type{$RotType{T}}) where {T} = $RotType{T}(zero(T), zero(T))
+            @inline one(::Type{$RotType}) = $RotType(0.0, 0.0)
+            @inline one(::Type{$RotType{T}}) where {T} = $RotType{T}(zero(T), zero(T))
+        end
+        if VERSION < v"0.7-"
+            @eval begin
+                eye(::Type{$RotType}) = one($RotType)
+                eye(::Type{$RotType{T}}) where {T} = one($RotType{T})
+            end
+        elseif isdefined(LinearAlgebra, :eye)
+            @eval begin
+                Base.@deprecate eye(::Type{$RotType}) one($RotType)
+                Base.@deprecate eye(::Type{$RotType{T}}) where {T} one($RotType{T})
+            end
         end
     end
 end
@@ -529,8 +551,19 @@ for axis1 in [:X, :Y, :Z]
                 @inline inv(r::$RotType) = $InvRotType(-r.theta3, -r.theta2, -r.theta1)
 
                 # define null rotations for convenience
-                @inline eye(::Type{$RotType}) = $RotType(0.0, 0.0, 0.0)
-                @inline eye(::Type{$RotType{T}}) where {T} = $RotType{T}(zero(T), zero(T), zero(T))
+                @inline one(::Type{$RotType}) = $RotType(0.0, 0.0, 0.0)
+                @inline one(::Type{$RotType{T}}) where {T} = $RotType{T}(zero(T), zero(T), zero(T))
+            end
+            if VERSION < v"0.7-"
+                @eval begin
+                    eye(::Type{$RotType}) = one($RotType)
+                    eye(::Type{$RotType{T}}) where {T} = one($RotType{T})
+                end
+            else
+                @eval begin
+                    Base.@deprecate eye(::Type{$RotType}) one($RotType)
+                    Base.@deprecate eye(::Type{$RotType{T}}) where {T} one($RotType{T})
+                end
             end
         end
     end

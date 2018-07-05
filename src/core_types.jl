@@ -110,9 +110,13 @@ end
 # A rotation is more-or-less defined as being an orthogonal (or unitary) matrix
 inv(r::RotMatrix) = RotMatrix(r.mat')
 
-# A useful constructor for identity rotation (eye is already provided by StaticArrays, but needs an eltype)
-@inline eye(::Type{RotMatrix{N}}) where {N} = RotMatrix((eye(SMatrix{N,N,Float64})))
-@inline eye(::Type{RotMatrix{N,T}}) where {N,T} = RotMatrix((eye(SMatrix{N,N,T})))
+if VERSION < v"0.7-"
+    eye(::Type{RotMatrix{N}}) where {N} = one(RotMatrix{N})
+    eye(::Type{RotMatrix{N,T}}) where {N,T} = one(RotMatrix{N,T})
+elseif isdefined(LinearAlgebra, :eye)
+    Base.@deprecate eye(::Type{RotMatrix{N}}) where {N} one(RotMatrix{N})
+    Base.@deprecate eye(::Type{RotMatrix{N,T}}) where {N,T} one(RotMatrix{N,T})
+end
 
 # By default, composition of rotations will go through RotMatrix, unless overridden
 @inline *(r1::Rotation, r2::Rotation) = RotMatrix(r1) * RotMatrix(r2)
@@ -143,12 +147,12 @@ function isrotation(r::AbstractMatrix{T}, tol::Real = 1000 * eps(eltype(T))) whe
         # Transpose is overloaded for many of our types, so we do it explicitly:
         r_trans = @SMatrix [conj(r[1,1])  conj(r[2,1]);
                             conj(r[1,2])  conj(r[2,2])]
-        d = Compat.norm((r * r_trans) - eye(SMatrix{2,2}))
+        d = Compat.norm((r * r_trans) - one(SMatrix{2,2}))
     elseif size(r) == (3,3)
         r_trans = @SMatrix [conj(r[1,1])  conj(r[2,1])  conj(r[3,1]);
                             conj(r[1,2])  conj(r[2,2])  conj(r[2,3]);
                             conj(r[1,3])  conj(r[2,3])  conj(r[3,3])]
-        d = Compat.norm((r * r_trans) - eye(SMatrix{3,3}))
+        d = Compat.norm((r * r_trans) - one(SMatrix{3,3}))
     else
         return false
     end

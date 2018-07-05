@@ -189,7 +189,7 @@ function jacobian(q::Quat, X::AbstractVector)
     # derivatives ignoring the scaling
     q_im = SVector(2*q.x, 2*q.y, 2*q.z)
     dRdQr  = SVector{3}(2 * q.w * X + cross(q_im, X))
-    dRdQim = -X * q_im' + dot(X, q_im) * eye(SMatrix{3,3,T}) + q_im * X' - 2*q.w * d_cross(X)
+    dRdQim = -X * q_im' + dot(X, q_im) * one(SMatrix{3,3,T}) + q_im * X' - 2*q.w * d_cross(X)
 
     dRdQs = hcat(dRdQr, dRdQim)
 
@@ -263,7 +263,7 @@ function hessian(::Type{Quaternion},  X::SpQuat)
 
     # dC/dxx terms (middle two terms cancel)
     T = eltype(A)
-    dCdxx = eye(Mat{3,3,T}) * (-2 * (A + B))
+    dCdxx = one(Mat{3,3,T}) * (-2 * (A + B))
 
     # dC/dxy terms (dB/dxdy and dA/dxdy) are zero
     # put it all together
@@ -451,7 +451,7 @@ function hessian(q::Quaternion, X::AbstractVector)
     #
     q_im = SVector(2*q.x, 2*q.y, 2*q.z)
     dRdQr  = 2 * q.w * X + cross(q_im, X)
-    dRdQim = -X * q_im' + dot(X, q_im) * eye(Mat{3,3,T}) + q_im * X' - 2* q.w * d_cross(X)
+    dRdQim = -X * q_im' + dot(X, q_im) * one(Mat{3,3,T}) + q_im * X' - 2* q.w * d_cross(X)
 
     #
     # second derivative ignoring the scaling
@@ -485,7 +485,7 @@ function hessian(q::Quaternion, X::AbstractVector)
     dSdQt = dSdQ'
 
     s2 = s*s
-    d2SdQ = (eye(Mat{4,4,T}) * s -  SVector(q) * dSdQ') / (s2)
+    d2SdQ = (one(Mat{4,4,T}) * s -  SVector(q) * dSdQ') / (s2)
 
     # and combine them
     dSdQ_2 = 2 * dSdQ * dSdQt

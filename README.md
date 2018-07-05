@@ -23,7 +23,7 @@ or [AffineTransforms.jl](https://github.com/timholy/AffineTransforms.jl) package
 using Rotations, StaticArrays
 
 # create the null rotation (identity matrix)
-id = eye(RotMatrix{3, Float64})
+id = one(RotMatrix{3, Float64})
 
 # create a random rotation matrix (uniformly distributed over all 3D rotations)
 r = rand(RotMatrix{3}) # uses Float64 by default

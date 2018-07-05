@@ -7,7 +7,7 @@ using Compat
 using Compat.LinearAlgebra
 using StaticArrays
 
-import Base: convert, eltype, size, length, getindex, *, Tuple
+import Base: convert, eltype, size, length, getindex, *, Tuple, one
 import Compat.LinearAlgebra: inv, eye
 
 if VERSION >= v"0.7.0-beta.85"

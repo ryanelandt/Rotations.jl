@@ -75,7 +75,7 @@ RotX
     end
 end
 
-@inline function Base.convert(::Type{Tuple}, r::RotX{T}) where T
+@inline function Tuple(r::RotX{T}) where T
     T2 = Base.promote_op(sin, T)
     (one(T2),   zero(T2),     zero(T2),   # transposed representation
      zero(T2),  cos(r.theta), sin(r.theta),
@@ -128,7 +128,7 @@ RotY
     end
 end
 
-@inline function Base.convert(::Type{Tuple}, r::RotY{T}) where T
+@inline function Tuple(r::RotY{T}) where T
     T2 = Base.promote_op(sin, T)
     (cos(r.theta), zero(T2), -sin(r.theta),   # transposed representation
      zero(T2),     one(T2),   zero(T2),
@@ -177,7 +177,7 @@ RotZ
     end
 end
 
-@inline function Base.convert(::Type{Tuple}, r::RotZ{T}) where T
+@inline function Tuple(r::RotZ{T}) where T
     T2 = Base.promote_op(sin, T)
     ( cos(r.theta), sin(r.theta), zero(T2),   # transposed representation
      -sin(r.theta), cos(r.theta), zero(T2),
@@ -226,7 +226,7 @@ for axis1 in [:X, :Y, :Z]
             @inline convert(::Type{R}, r::R) where {R<:$RotType} = r
 
             @inline function Base.getindex(r::$RotType{T}, i::Int) where T
-                convert(Tuple, r)[i] # Slow...
+                Tuple(r)[i] # Slow...
             end
 
             @inline (::Type{R})(t::NTuple{9}) where {R<:$RotType} = error("Cannot construct a two-axis rotation from a matrix")
@@ -269,7 +269,7 @@ followed by a rotation by `theta_x` about the X axis.
 """
 RotXY
 
-@inline function Base.convert(::Type{Tuple}, r::RotXY{T}) where T
+@inline function Tuple(r::RotXY{T}) where T
     sinθ₁ = sin(r.theta1)
     cosθ₁ = cos(r.theta1)
     sinθ₂ = sin(r.theta2)
@@ -310,7 +310,7 @@ followed by a rotation by `theta_y` about the Y axis.
 """
 RotYX
 
-@inline function Base.convert(::Type{Tuple}, r::RotYX{T}) where T
+@inline function Tuple(r::RotYX{T}) where T
     sinθ₁ = sin(r.theta1)
     cosθ₁ = cos(r.theta1)
     sinθ₂ = sin(r.theta2)
@@ -351,7 +351,7 @@ followed by a rotation by `theta_x` about the X axis.
 """
 RotXZ
 
-@inline function Base.convert(::Type{Tuple}, r::RotXZ{T}) where T
+@inline function Tuple(r::RotXZ{T}) where T
     sinθ₁ = sin(r.theta1)
     cosθ₁ = cos(r.theta1)
     sinθ₂ = sin(r.theta2)
@@ -392,7 +392,7 @@ followed by a rotation by `theta_z` about the Z axis.
 """
 RotZX
 
-@inline function Base.convert(::Type{Tuple}, r::RotZX{T}) where T
+@inline function Tuple(r::RotZX{T}) where T
     sinθ₁ = sin(r.theta1)
     cosθ₁ = cos(r.theta1)
     sinθ₂ = sin(r.theta2)
@@ -433,7 +433,7 @@ followed by a rotation by `theta_z` about the Z axis.
 """
 RotZY
 
-@inline function Base.convert(::Type{Tuple}, r::RotZY{T}) where T
+@inline function Tuple(r::RotZY{T}) where T
     sinθ₁ = sin(r.theta1)
     cosθ₁ = cos(r.theta1)
     sinθ₂ = sin(r.theta2)
@@ -474,7 +474,7 @@ followed by a rotation by `theta_y` about the Y axis.
 """
 RotYZ
 
-@inline function Base.convert(::Type{Tuple}, r::RotYZ{T}) where T
+@inline function Tuple(r::RotYZ{T}) where T
     sinθ₁ = sin(r.theta1)
     cosθ₁ = cos(r.theta1)
     sinθ₂ = sin(r.theta2)
@@ -539,7 +539,7 @@ for axis1 in [:X, :Y, :Z]
                 @inline convert(::Type{R}, r::R) where {R<:$RotType} = r
 
                 @inline function Base.getindex(r::$RotType{T}, i::Int) where T
-                    convert(Tuple, r)[i] # Slow...
+                    Tuple(r)[i] # Slow...
                 end
 
                 # Composing single-axis rotations with two-axis rotations:
@@ -590,7 +590,7 @@ RotXYX
         atan(- R[2, 3]*ct1 - R[3, 3]*st1, R[2, 2]*ct1 + R[3, 2]*st1))
 end
 
-@inline function Base.convert(::Type{Tuple}, r::RotXYX{T}) where T
+@inline function Tuple(r::RotXYX{T}) where T
     sinθ₁ = sin(r.theta1)
     cosθ₁ = cos(r.theta1)
     sinθ₂ = sin(r.theta2)
@@ -647,7 +647,7 @@ RotXZX
         atan(R[3, 2]*ct1 - R[2, 2]*st1, R[3, 3]*ct1 - R[2, 3]*st1))
 end
 
-@inline function Base.convert(::Type{Tuple}, r::RotXZX{T}) where T
+@inline function Tuple(r::RotXZX{T}) where T
     sinθ₁ = sin(r.theta1)
     cosθ₁ = cos(r.theta1)
     sinθ₂ = sin(r.theta2)
@@ -704,7 +704,7 @@ RotYXY
         atan(R[1, 3]*ct1 - R[3, 3]*st1, R[1, 1]*ct1 - R[3, 1]*st1))
 end
 
-@inline function Base.convert(::Type{Tuple}, r::RotYXY{T}) where T
+@inline function Tuple(r::RotYXY{T}) where T
     sinθ₁ = sin(r.theta1)
     cosθ₁ = cos(r.theta1)
     sinθ₂ = sin(r.theta2)
@@ -761,7 +761,7 @@ RotYZY
         atan(- R[3, 1]*ct1 - R[1, 1]*st1, R[3, 3]*ct1 + R[1, 3]*st1))
 end
 
-@inline function Base.convert(::Type{Tuple}, r::RotYZY{T}) where T
+@inline function Tuple(r::RotYZY{T}) where T
     sinθ₁ = sin(r.theta1)
     cosθ₁ = cos(r.theta1)
     sinθ₂ = sin(r.theta2)
@@ -818,7 +818,7 @@ RotZXZ
         atan(- R[1, 2]*ct1 - R[2, 2]*st1, R[1, 1]*ct1 + R[2, 1]*st1))
 end
 
-@inline function Base.convert(::Type{Tuple}, r::RotZXZ{T}) where T
+@inline function Tuple(r::RotZXZ{T}) where T
     sinθ₁ = sin(r.theta1)
     cosθ₁ = cos(r.theta1)
     sinθ₂ = sin(r.theta2)
@@ -875,7 +875,7 @@ RotZYZ
         atan(R[2, 1]*ct1 - R[1, 1]*st1, R[2, 2]*ct1 - R[1, 2]*st1))
 end
 
-@inline function Base.convert(::Type{Tuple}, r::RotZYZ{T}) where T
+@inline function Tuple(r::RotZYZ{T}) where T
     sinθ₁ = sin(r.theta1)
     cosθ₁ = cos(r.theta1)
     sinθ₂ = sin(r.theta2)
@@ -942,7 +942,7 @@ RotXYZ
         atan(R[2, 1]*ct1 + R[3, 1]*st1, R[2, 2]*ct1 + R[3, 2]*st1))
 end
 
-@inline function Base.convert(::Type{Tuple}, r::RotXYZ{T}) where T
+@inline function Tuple(r::RotXYZ{T}) where T
     sinθ₁ = sin(r.theta1)
     cosθ₁ = cos(r.theta1)
     sinθ₂ = sin(r.theta2)
@@ -1006,7 +1006,7 @@ RotZYX
         atan(R[1, 3]*st1 - R[2, 3]*ct1, R[2, 2]*ct1 - R[1, 2]*st1))
 end
 
-@inline function Base.convert(::Type{Tuple}, r::RotZYX{T}) where T
+@inline function Tuple(r::RotZYX{T}) where T
     sinθ₁ = sin(r.theta1)
     cosθ₁ = cos(r.theta1)
     sinθ₂ = sin(r.theta2)
@@ -1070,7 +1070,7 @@ RotXZY
         atan(R[2, 1]*st1 - R[3, 1]*ct1, R[3, 3]*ct1 - R[2, 3]*st1))
 end
 
-@inline function Base.convert(::Type{Tuple}, r::RotXZY{T}) where T
+@inline function Tuple(r::RotXZY{T}) where T
     sinθ₁ = sin(r.theta1)
     cosθ₁ = cos(r.theta1)
     sinθ₂ = sin(r.theta2)
@@ -1134,7 +1134,7 @@ RotYZX
         atan(R[3, 2]*ct1 + R[1, 2]*st1, R[3, 3]*ct1 + R[1, 3]*st1))
 end
 
-@inline function Base.convert(::Type{Tuple}, r::RotYZX{T}) where T
+@inline function Tuple(r::RotYZX{T}) where T
     sinθ₁ = sin(r.theta1)
     cosθ₁ = cos(r.theta1)
     sinθ₂ = sin(r.theta2)
@@ -1198,7 +1198,7 @@ RotYXZ
         atan(R[3, 2]*st1 - R[1, 2]*ct1, R[1, 1]*ct1 - R[3, 1]*st1))
 end
 
-@inline function Base.convert(::Type{Tuple}, r::RotYXZ{T}) where T
+@inline function Tuple(r::RotYXZ{T}) where T
     sinθ₁ = sin(r.theta1)
     cosθ₁ = cos(r.theta1)
     sinθ₂ = sin(r.theta2)
@@ -1262,7 +1262,7 @@ RotZXY
         atan(R[1, 3]*ct1 + R[2, 3]*st1, R[1, 1]*ct1 + R[2, 1]*st1))
 end
 
-@inline function Base.convert(::Type{Tuple}, r::RotZXY{T}) where T
+@inline function Tuple(r::RotZXY{T}) where T
     sinθ₁ = sin(r.theta1)
     cosθ₁ = cos(r.theta1)
     sinθ₂ = sin(r.theta2)

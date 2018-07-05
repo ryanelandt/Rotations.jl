@@ -36,15 +36,10 @@ for axis in [:X, :Y, :Z]
     end
 end
 
-function Base.rand(::Type{R}) where R <: Union{RotX,RotY,RotZ}
-    T = eltype(R)
-    if T == Any
-        T = Float64
-    end
+const OneAxisRotation{T} = Union{RotX{T}, RotY{T}, RotZ{T}}
 
-    return R(2*pi*rand(T))
-end
-
+Base.rand(::Type{R}) where {T, R<:OneAxisRotation{T}} = R(2*pi*rand(T))
+Base.rand(::Type{R}) where {R<:OneAxisRotation} = rand(R{Float64})
 
 """
     struct RotX{T} <: Rotation{3,T}
@@ -247,17 +242,13 @@ for axis1 in [:X, :Y, :Z]
     end
 end
 
-function Base.rand(::Type{R}) where R <: Union{RotXY,RotYZ,RotZX, RotXZ, RotYX, RotZY}
-    T = eltype(R)
-    if T == Any
-        T = Float64
-    end
+const TwoAxisRotation{T} = Union{RotXY{T}, RotYZ{T},RotZX{T}, RotXZ{T}, RotYX{T}, RotZY{T}}
 
-    # Not really sure what this distribution is, but it's also not clear what
-    # it should be! rand(RotXY) *is* invariant to pre-rotations by a RotX and
-    # post-rotations by a RotY...
-    return R(2*pi*rand(T), 2*pi*rand(T))
-end
+# Not really sure what this distribution is, but it's also not clear what
+# it should be! rand(RotXY) *is* invariant to pre-rotations by a RotX and
+# post-rotations by a RotY...
+Base.rand(::Type{R}) where {T, R<:TwoAxisRotation{T}} = R(2*pi*rand(T), 2*pi*rand(T))
+Base.rand(::Type{R}) where {R<:TwoAxisRotation} = rand(R{Float64})
 
 
 """

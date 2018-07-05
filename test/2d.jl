@@ -112,6 +112,10 @@ using Rotations, StaticArrays, Compat.Test
             @test R * R ≈ T[0 -1; 1 0]
         end
     end
+
+    @testset "rand inference" begin
+        @inferred rand(RotMatrix{2})
+    end
 end
 
 nothing

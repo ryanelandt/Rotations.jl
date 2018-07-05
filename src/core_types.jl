@@ -22,27 +22,14 @@ rotation_axis(r::Rotation) = rotation_axis(AngleAxis(r))
 Base.@pure StaticArrays.similar_type(::Union{R,Type{R}}) where {R <: Rotation} = SMatrix{size(R)..., eltype(R), prod(size(R))}
 Base.@pure StaticArrays.similar_type(::Union{R,Type{R}}, ::Type{T}) where {R <: Rotation, T} = SMatrix{size(R)..., T, prod(size(R))}
 
-function Base.rand(::Type{R}) where R <: Rotation{2}
-    T = eltype(R)
-    if T == Any
-        T = Float64
-    end
-
-    R(2π * rand(T))
-end
+Base.rand(::Type{Rotation{2, T}}) where {T} = Rotation{2, T}(2π * rand(T))
+Base.rand(::Type{Rotation{2}}) = rand(Rotation{2, Float64})
 
 # A random rotation can be obtained easily with unit quaternions
 # The unit sphere in R⁴ parameterizes quaternion rotations according to the
 # Haar measure of SO(3) - see e.g. http://math.stackexchange.com/questions/184086/uniform-distributions-on-the-space-of-rotations-in-3d
-function Base.rand(::Type{R}) where R <: Rotation{3}
-    T = eltype(R)
-    if T == Any
-        T = Float64
-    end
-
-    q = Quat(randn(T), randn(T), randn(T), randn(T))
-    return R(q)
-end
+Base.rand(::Type{Rotation{3, T}}) where {T} = Rotation{3, T}(Quat(randn(T), randn(T), randn(T), randn(T)))
+Base.rand(::Type{Rotation{3}}) = rand(Rotation{3, Float64})
 
 # Useful for converting arrays of rotations to another rotation eltype, for instance.
 # Only works because parameters of all the rotations are of a similar form

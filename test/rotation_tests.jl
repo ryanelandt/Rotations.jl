@@ -315,4 +315,8 @@ all_types = (RotMatrix{3}, Quat, SPQuat, AngleAxis, RodriguesVec,
         str = String(take!(io))
         @test startswith(str, "3×3 RotXYZ{Float64}(1.0, 2.0, 3.0):")
     end
+
+    @testset "rand inference $R" for R in all_types
+        @inferred rand(R)
+    end
 end

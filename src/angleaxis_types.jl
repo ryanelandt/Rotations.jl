@@ -52,8 +52,7 @@ end
     # Rodrigues' rotation formula.
     T = eltype(aa)
 
-    s = sin(aa.theta)
-    c = cos(aa.theta)
+    s, c = _sincos(aa.theta)
     c1 = one(T) - c
 
     c1x2 = c1 * aa.axis_x^2
@@ -75,9 +74,7 @@ end
 end
 
 @inline function Base.convert(::Type{Q}, aa::AngleAxis) where Q <: Quat
-    theta_2 = aa.theta / 2
-    c = cos(theta_2)
-    s = sin(theta_2)
+    s, c = _sincos(aa.theta / 2)
     return Q(c, s * aa.axis_x, s * aa.axis_y, s * aa.axis_z, false)
 end
 
@@ -96,7 +93,7 @@ function Base.:*(aa::AngleAxis, v::StaticVector)
     end
 
     w = rotation_axis(aa)
-    ct, st = cos(aa.theta), sin(aa.theta)
+    st, ct = _sincos(aa.theta)
     w_cross_pt = cross(w, v)
     m = dot(v, w) * (one(w_cross_pt[1]) - ct)
     T = promote_type(eltype(aa), eltype(v))

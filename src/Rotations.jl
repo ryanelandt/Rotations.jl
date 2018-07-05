@@ -16,6 +16,12 @@ else
     import Base: mean
 end
 
+if isdefined(Base, :sincos)
+    const _sincos = sincos
+else
+    _sincos(x) = (sin(x), cos(x))
+end
+
 include("util.jl")
 include("core_types.jl")
 include("quaternion_types.jl")

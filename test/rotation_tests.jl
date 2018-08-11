@@ -105,7 +105,7 @@ all_types = (RotMatrix{3}, Quat, SPQuat, AngleAxis, RodriguesVec,
         repeats = 100
         I = one(RotMatrix{3,Float64})
         @testset "$(R)" for R in all_types
-            srand(0)
+            Random.seed!(0)
             for i = 1:repeats
                 r = rand(R)
                 @test inv(r) == adjoint(r)
@@ -124,7 +124,7 @@ all_types = (RotMatrix{3}, Quat, SPQuat, AngleAxis, RodriguesVec,
     @testset "Rotate Points" begin
         repeats = 100
         @testset "$(R)" for R in all_types
-            srand(0)
+            Random.seed!(0)
             for i = 1:repeats
                 r = rand(R)
                 m = SMatrix(r)
@@ -146,7 +146,7 @@ all_types = (RotMatrix{3}, Quat, SPQuat, AngleAxis, RodriguesVec,
     @testset "Compose rotations" begin
         repeats = 100
         @testset "$(R1) * $(R2)" for R1 in all_types, R2 in all_types
-            srand(0)
+            Random.seed!(0)
             for i = 1:repeats
                 r1 = rand(R1)
                 m1 = SMatrix(r1)
@@ -166,7 +166,7 @@ all_types = (RotMatrix{3}, Quat, SPQuat, AngleAxis, RodriguesVec,
     @testset "Convert rotations" begin
         repeats = 100
         @testset "convert $(R1) -> $(R2)" for R1 in all_types, R2 in rot_types
-            srand(0)
+            Random.seed!(0)
             for i = 1:repeats
                 r1 = rand(R1)
                 m1 = SMatrix(r1)
@@ -203,7 +203,7 @@ all_types = (RotMatrix{3}, Quat, SPQuat, AngleAxis, RodriguesVec,
     @testset "Testing angle / axis extraction" begin
         repeats = 100
         @testset "$(R)" for R in rot_types
-            srand(0)
+            Random.seed!(0)
             for i = 1:repeats
                 r1 = rand(AngleAxis)
 
@@ -262,7 +262,7 @@ all_types = (RotMatrix{3}, Quat, SPQuat, AngleAxis, RodriguesVec,
         repeats = 100
         s = 1e-4
         @testset "$(R)" for R in taitbyran_types
-            srand(0)
+            Random.seed!(0)
             for i = 1:repeats
                 roll = s*(rand()-0.5)
                 pitch = s*(rand()-0.5)

@@ -1,13 +1,12 @@
-using Compat
 using Rotations
 using BenchmarkTools
 import Base.Iterators: product
-import Compat.Random: srand
+import Random: Random.seed!
 
 const T = Float64
 
 const suite = BenchmarkGroup()
-srand(1)
+Random.seed!(1)
 
 noneuler = suite["Non-Euler conversions"] = BenchmarkGroup()
 rotationtypes = [RotMatrix3{T}, Quat{T}, SPQuat{T}, AngleAxis{T}, RodriguesVec{T}]
@@ -65,7 +64,7 @@ for (groupname, groupresults) in results
     max_name_length = maximum(length, keys(groupresults))
     for (name, trial) in groupresults
         if minimum(trial).allocs != 0
-            Compat.@warn("$name  allocates!")
+            @warn("$name  allocates!")
         end
         println(rpad(name, max_name_length), " ", BenchmarkTools.prettytime(minimum(trial).time))
     end

@@ -1,3 +1,2 @@
-julia 0.6
-StaticArrays 0.6.5
-Compat 0.70 # for norm
+julia 0.7
+StaticArrays 0.8.3

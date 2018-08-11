@@ -9,8 +9,8 @@ abstract type Rotation{N,T} <: StaticMatrix{N,N,T} end
 Base.@pure StaticArrays.Size(::Type{Rotation{N}}) where {N} = Size(N,N)
 Base.@pure StaticArrays.Size(::Type{Rotation{N,T}}) where {N,T} = Size(N,N)
 Base.@pure StaticArrays.Size(::Type{R}) where {R<:Rotation} = Size(supertype(R))
-Compat.adjoint(r::Rotation) = inv(r)
-Compat.transpose(r::Rotation{N,T}) where {N,T<:Real} = inv(r)
+adjoint(r::Rotation) = inv(r)
+transpose(r::Rotation{N,T}) where {N,T<:Real} = inv(r)
 
 # Rotation angles and axes can be obtained by converting to the AngleAxis type
 rotation_angle(r::Rotation) = rotation_angle(AngleAxis(r))
@@ -147,12 +147,12 @@ function isrotation(r::AbstractMatrix{T}, tol::Real = 1000 * eps(eltype(T))) whe
         # Transpose is overloaded for many of our types, so we do it explicitly:
         r_trans = @SMatrix [conj(r[1,1])  conj(r[2,1]);
                             conj(r[1,2])  conj(r[2,2])]
-        d = Compat.norm((r * r_trans) - one(SMatrix{2,2}))
+        d = norm((r * r_trans) - one(SMatrix{2,2}))
     elseif size(r) == (3,3)
         r_trans = @SMatrix [conj(r[1,1])  conj(r[2,1])  conj(r[3,1]);
                             conj(r[1,2])  conj(r[2,2])  conj(r[2,3]);
                             conj(r[1,3])  conj(r[2,3])  conj(r[3,3])]
-        d = Compat.norm((r * r_trans) - one(SMatrix{3,3}))
+        d = norm((r * r_trans) - one(SMatrix{3,3}))
     else
         return false
     end

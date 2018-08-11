@@ -3,7 +3,7 @@ using LinearAlgebra
 using Rotations
 using StaticArrays
 
-import Random: Random.seed!
+import Random
 
 # Check that there are no ambiguities beyond those present in StaticArrays
 ramb = detect_ambiguities(Rotations, Base, Core)

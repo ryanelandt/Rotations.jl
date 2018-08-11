@@ -13,9 +13,9 @@ addons:
     - hdf5-tools # work around HDF5 install issue on Trusty, see https://discourse.julialang.org/t/hdf5-fails-on-travis-ci-with-trusty-works-with-precise/4961
 notifications:
   email: false
-#matrix:
-#  allow_failures:
-#    - julia: nightly
+matrix:
+  allow_failures:
+    - julia: nightly
 #     - os: osx
 # uncomment the following lines to override the default test script
 #script:

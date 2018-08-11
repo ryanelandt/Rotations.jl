@@ -1,7 +1,7 @@
 using Rotations
 using BenchmarkTools
 import Base.Iterators: product
-import Random: Random.seed!
+import Random
 
 const T = Float64
 

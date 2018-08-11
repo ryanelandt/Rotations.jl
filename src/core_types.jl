@@ -9,8 +9,8 @@ abstract type Rotation{N,T} <: StaticMatrix{N,N,T} end
 Base.@pure StaticArrays.Size(::Type{Rotation{N}}) where {N} = Size(N,N)
 Base.@pure StaticArrays.Size(::Type{Rotation{N,T}}) where {N,T} = Size(N,N)
 Base.@pure StaticArrays.Size(::Type{R}) where {R<:Rotation} = Size(supertype(R))
-adjoint(r::Rotation) = inv(r)
-transpose(r::Rotation{N,T}) where {N,T<:Real} = inv(r)
+Base.adjoint(r::Rotation) = inv(r)
+Base.transpose(r::Rotation{N,T}) where {N,T<:Real} = inv(r)
 
 # Rotation angles and axes can be obtained by converting to the AngleAxis type
 rotation_angle(r::Rotation) = rotation_angle(AngleAxis(r))

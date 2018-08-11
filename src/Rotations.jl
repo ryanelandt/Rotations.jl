@@ -3,24 +3,11 @@ __precompile__(true)
 
 module Rotations
 
-using Compat
-using Compat.LinearAlgebra
 using StaticArrays
 
 import Base: convert, eltype, size, length, getindex, *, Tuple, one
-import Compat.LinearAlgebra: inv, eye
 
-if VERSION >= v"0.7.0-beta.85"
-    import Statistics: mean
-else
-    import Base: mean
-end
-
-if isdefined(Base, :sincos)
-    const _sincos = sincos
-else
-    _sincos(x) = (sin(x), cos(x))
-end
+import Statistics: mean
 
 include("util.jl")
 include("core_types.jl")

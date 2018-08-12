@@ -38,8 +38,8 @@ end
 end
 @inline Quat(q::Quat{T}) where {T} = Quat{T}(q)
 
-@inline convert(::Type{Q}, q::Quat) where {Q<:Quat} = Q(q)
-@inline convert(::Type{Q}, q::Q) where {Q<:Quat} = q
+@inline Base.convert(::Type{Q}, q::Quat) where {Q<:Quat} = Q(q)
+@inline Base.convert(::Type{Q}, q::Q) where {Q<:Quat} = q
 
 # These 3 functions are enough to satisfy the entire StaticArrays interface:
 function (::Type{Q})(t::NTuple{9}) where Q<:Quat
@@ -139,7 +139,7 @@ function Base.getindex(q::Quat, i::Int)
     end
 end
 
-function Tuple(q::Quat)
+function Base.Tuple(q::Quat)
     ww = (q.w * q.w)
     xx = (q.x * q.x)
     yy = (q.y * q.y)
@@ -188,12 +188,12 @@ function Base.:*(q1::Quat, q2::Quat)
             q1.w*q2.z + q1.x*q2.y - q1.y*q2.x + q1.z*q2.w)
 end
 
-function inv(q::Quat)
+function Base.inv(q::Quat)
     Quat(q.w, -q.x, -q.y, -q.z)
 end
 
-@inline one(::Type{Quat}) = Quat(1.0, 0.0, 0.0, 0.0)
-@inline one(::Type{Quat{T}}) where {T} = Quat{T}(one(T), zero(T), zero(T), zero(T))
+@inline Base.one(::Type{Quat}) = Quat(1.0, 0.0, 0.0, 0.0)
+@inline Base.one(::Type{Quat{T}}) where {T} = Quat{T}(one(T), zero(T), zero(T), zero(T))
 
 """
     rotation_between(from, to)
@@ -248,13 +248,13 @@ end
 @inline SPQuat(x::X, y::Y, z::Z) where {X,Y,Z} = SPQuat{promote_type(promote_type(X, Y), Z)}(x, y, z)
 @inline SPQuat(spq::SPQuat{T}) where {T} = SPQuat{T}(spq)
 
-@inline convert(::Type{SPQ}, spq::SPQuat) where {SPQ<:SPQuat} = SPQ(spq)
-@inline convert(::Type{SPQ}, spq::SPQ) where {SPQ<:SPQuat} = spq
+@inline Base.convert(::Type{SPQ}, spq::SPQuat) where {SPQ<:SPQuat} = SPQ(spq)
+@inline Base.convert(::Type{SPQ}, spq::SPQ) where {SPQ<:SPQuat} = spq
 
 # These functions are enough to satisfy the entire StaticArrays interface:
 @inline (::Type{SPQ})(t::NTuple{9}) where {SPQ <: SPQuat} = convert(SPQ, Quat(t))
 @inline Base.getindex(spq::SPQuat, i::Int) = convert(Quat, spq)[i]
-@inline Tuple(spq::SPQuat) = Tuple(convert(Quat, spq))
+@inline Base.Tuple(spq::SPQuat) = Tuple(convert(Quat, spq))
 
 @inline function Base.convert(::Type{Q}, spq::SPQuat) where Q <: Quat
     # Both the sign and norm of the Quat is automatically dealt with in its inner constructor
@@ -274,10 +274,10 @@ end
 @inline Base.:*(r::RotMatrix, spq::SPQuat) = r * Quat(spq)
 @inline Base.:*(spq1::SPQuat, spq2::SPQuat) = Quat(spq1) * Quat(spq2)
 
-@inline inv(spq::SPQuat) = SPQuat(-spq.x, -spq.y, -spq.z)
+@inline Base.inv(spq::SPQuat) = SPQuat(-spq.x, -spq.y, -spq.z)
 
-@inline one(::Type{SPQuat}) = SPQuat(0.0, 0.0, 0.0)
-@inline one(::Type{SPQuat{T}}) where {T} = SPQuat{T}(zero(T), zero(T), zero(T))
+@inline Base.one(::Type{SPQuat}) = SPQuat(0.0, 0.0, 0.0)
+@inline Base.one(::Type{SPQuat{T}}) where {T} = SPQuat{T}(zero(T), zero(T), zero(T))
 
 # rotation properties
 @inline rotation_angle(spq::SPQuat) = rotation_angle(Quat(spq))

@@ -110,7 +110,7 @@ end
 @inline Base.:*(r::SPQuat, aa::AngleAxis) = r * Quat(aa)
 @inline Base.:*(aa1::AngleAxis, aa2::AngleAxis) = Quat(aa1) * Quat(aa2)
 
-@inline inv(aa::AngleAxis) = AngleAxis(-aa.theta, aa.axis_x, aa.axis_y, aa.axis_z)
+@inline Base.inv(aa::AngleAxis) = AngleAxis(-aa.theta, aa.axis_x, aa.axis_y, aa.axis_z)
 @inline Base.:^(aa::AngleAxis, t::Real) = AngleAxis(aa.theta*t, aa.axis_x, aa.axis_y, aa.axis_z)
 @inline Base.:^(aa::AngleAxis, t::Integer) = AngleAxis(aa.theta*t, aa.axis_x, aa.axis_y, aa.axis_z) # to avoid ambiguity
 
@@ -147,7 +147,7 @@ end
 # These functions are enough to satisfy the entire StaticArrays interface:
 @inline (::Type{RV})(t::NTuple{9}) where {RV <: RodriguesVec} = convert(RV, Quat(t))
 @inline Base.getindex(aa::RodriguesVec, i::Int) = convert(Quat, aa)[i]
-@inline Tuple(rv::RodriguesVec) = Tuple(convert(Quat, rv))
+@inline Base.Tuple(rv::RodriguesVec) = Tuple(convert(Quat, rv))
 
 # define its interaction with other angle representations
 @inline Base.convert(::Type{R}, rv::RodriguesVec) where {R <: RotMatrix} = convert(R, AngleAxis(rv))
@@ -205,7 +205,7 @@ end
 @inline Base.:*(r::AngleAxis, rv::RodriguesVec) = r * Quat(rv)
 @inline Base.:*(rv1::RodriguesVec, rv2::RodriguesVec) = Quat(rv1) * Quat(rv2)
 
-@inline inv(rv::RodriguesVec) = RodriguesVec(-rv.sx, -rv.sy, -rv.sz)
+@inline Base.inv(rv::RodriguesVec) = RodriguesVec(-rv.sx, -rv.sy, -rv.sz)
 @inline Base.:^(rv::RodriguesVec, t::Real) = RodriguesVec(rv.sx*t, rv.sy*t, rv.sz*t)
 @inline Base.:^(rv::RodriguesVec, t::Integer) = RodriguesVec(rv.sx*t, rv.sy*t, rv.sz*t) # to avoid ambiguity
 

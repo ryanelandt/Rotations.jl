@@ -21,18 +21,18 @@ for axis in [:X, :Y, :Z]
         @inline $RotType(theta::T) where {T} = $RotType{T}(theta)
         @inline $RotType(r::$RotType{T}) where {T} = $RotType{T}(r)
 
-        @inline convert(::Type{R}, r::$RotType) where {R<:$RotType} = R(r)
-        @inline convert(::Type{R}, r::R) where {R<:$RotType} = r
+        @inline Base.convert(::Type{R}, r::$RotType) where {R<:$RotType} = R(r)
+        @inline Base.convert(::Type{R}, r::R) where {R<:$RotType} = r
 
         @inline (::Type{R})(t::NTuple{9}) where {R<:$RotType} = error("Cannot construct a cardinal axis rotation from a matrix")
 
         @inline Base.:*(r1::$RotType, r2::$RotType) = $RotType(r1.theta + r2.theta)
 
-        @inline inv(r::$RotType) = $RotType(-r.theta)
+        @inline Base.inv(r::$RotType) = $RotType(-r.theta)
 
         # define null rotations for convenience
-        @inline one(::Type{$RotType}) = $RotType(0.0)
-        @inline one(::Type{$RotType{T}}) where {T} = $RotType{T}(zero(T))
+        @inline Base.one(::Type{$RotType}) = $RotType(0.0)
+        @inline Base.one(::Type{$RotType{T}}) where {T} = $RotType{T}(zero(T))
     end
 end
 
@@ -75,7 +75,7 @@ RotX
     end
 end
 
-@inline function Tuple(r::RotX{T}) where T
+@inline function Base.Tuple(r::RotX{T}) where T
     s, c = sincos(r.theta)
     o = one(s)
     z = zero(s)
@@ -130,7 +130,7 @@ RotY
     end
 end
 
-@inline function Tuple(r::RotY{T}) where T
+@inline function Base.Tuple(r::RotY{T}) where T
     s, c = sincos(r.theta)
     o = one(s)
     z = zero(s)
@@ -181,7 +181,7 @@ RotZ
     end
 end
 
-@inline function Tuple(r::RotZ{T}) where T
+@inline function Base.Tuple(r::RotZ{T}) where T
     s, c = sincos(r.theta)
     o = one(s)
     z = zero(s)
@@ -228,8 +228,8 @@ for axis1 in [:X, :Y, :Z]
             @inline $RotType(theta1::T1, theta2::T2) where {T1, T2} = $RotType{promote_type(T1, T2)}(theta1, theta2)
             @inline $RotType(r::$RotType{T}) where {T} = $RotType{T}(r)
 
-            @inline convert(::Type{R}, r::$RotType) where {R<:$RotType} = R(r)
-            @inline convert(::Type{R}, r::R) where {R<:$RotType} = r
+            @inline Base.convert(::Type{R}, r::$RotType) where {R<:$RotType} = R(r)
+            @inline Base.convert(::Type{R}, r::R) where {R<:$RotType} = r
 
             @inline function Base.getindex(r::$RotType{T}, i::Int) where T
                 Tuple(r)[i] # Slow...
@@ -244,11 +244,11 @@ for axis1 in [:X, :Y, :Z]
             @inline Base.:*(r1::$RotType, r2::$Rot2Type) = $RotType(r1.theta1, r1.theta2 + r2.theta)
             @inline Base.:*(r1::$Rot1Type, r2::$RotType) = $RotType(r1.theta + r2.theta1, r2.theta2)
 
-            @inline inv(r::$RotType) = $InvRotType(-r.theta2, -r.theta1)
+            @inline Base.inv(r::$RotType) = $InvRotType(-r.theta2, -r.theta1)
 
             # define null rotations for convenience
-            @inline one(::Type{$RotType}) = $RotType(0.0, 0.0)
-            @inline one(::Type{$RotType{T}}) where {T} = $RotType{T}(zero(T), zero(T))
+            @inline Base.one(::Type{$RotType}) = $RotType(0.0, 0.0)
+            @inline Base.one(::Type{$RotType{T}}) where {T} = $RotType{T}(zero(T), zero(T))
         end
     end
 end
@@ -275,7 +275,7 @@ followed by a rotation by `theta_x` about the X axis.
 """
 RotXY
 
-@inline function Tuple(r::RotXY{T}) where T
+@inline function Base.Tuple(r::RotXY{T}) where T
     sinθ₁, cosθ₁ = sincos(r.theta1)
     sinθ₂, cosθ₂ = sincos(r.theta2)
     z = zero(sinθ₁)
@@ -311,7 +311,7 @@ followed by a rotation by `theta_y` about the Y axis.
 """
 RotYX
 
-@inline function Tuple(r::RotYX{T}) where T
+@inline function Base.Tuple(r::RotYX{T}) where T
     sinθ₁, cosθ₁ = sincos(r.theta1)
     sinθ₂, cosθ₂ = sincos(r.theta2)
     z = zero(sinθ₁)
@@ -347,7 +347,7 @@ followed by a rotation by `theta_x` about the X axis.
 """
 RotXZ
 
-@inline function Tuple(r::RotXZ{T}) where T
+@inline function Base.Tuple(r::RotXZ{T}) where T
     sinθ₁, cosθ₁ = sincos(r.theta1)
     sinθ₂, cosθ₂ = sincos(r.theta2)
     z = zero(sinθ₁)
@@ -383,7 +383,7 @@ followed by a rotation by `theta_z` about the Z axis.
 """
 RotZX
 
-@inline function Tuple(r::RotZX{T}) where T
+@inline function Base.Tuple(r::RotZX{T}) where T
     sinθ₁, cosθ₁ = sincos(r.theta1)
     sinθ₂, cosθ₂ = sincos(r.theta2)
     z = zero(sinθ₁)
@@ -419,7 +419,7 @@ followed by a rotation by `theta_z` about the Z axis.
 """
 RotZY
 
-@inline function Tuple(r::RotZY{T}) where T
+@inline function Base.Tuple(r::RotZY{T}) where T
     sinθ₁, cosθ₁ = sincos(r.theta1)
     sinθ₂, cosθ₂ = sincos(r.theta2)
     z = zero(sinθ₁)
@@ -455,7 +455,7 @@ followed by a rotation by `theta_y` about the Y axis.
 """
 RotYZ
 
-@inline function Tuple(r::RotYZ{T}) where T
+@inline function Base.Tuple(r::RotYZ{T}) where T
     sinθ₁, cosθ₁ = sincos(r.theta1)
     sinθ₂, cosθ₂ = sincos(r.theta2)
     z = zero(sinθ₁)
@@ -511,8 +511,8 @@ for axis1 in [:X, :Y, :Z]
                 @inline $RotType(theta1::T1, theta2::T2, theta3::T3) where {T1, T2, T3} = $RotType{promote_type(promote_type(T1, T2), T3)}(theta1, theta2, theta3)
                 @inline $RotType(r::$RotType{T}) where {T} = $RotType{T}(r)
 
-                @inline convert(::Type{R}, r::$RotType) where {R<:$RotType} = R(r)
-                @inline convert(::Type{R}, r::R) where {R<:$RotType} = r
+                @inline Base.convert(::Type{R}, r::$RotType) where {R<:$RotType} = R(r)
+                @inline Base.convert(::Type{R}, r::R) where {R<:$RotType} = r
 
                 @inline function Base.getindex(r::$RotType{T}, i::Int) where T
                     Tuple(r)[i] # Slow...
@@ -526,11 +526,11 @@ for axis1 in [:X, :Y, :Z]
                 @inline Base.:*(r1::$RotType, r2::$Rot3Type) = $RotType(r1.theta1, r1.theta2, r1.theta3 + r2.theta)
                 @inline Base.:*(r1::$Rot1Type, r2::$RotType) = $RotType(r1.theta + r2.theta1, r2.theta2, r2.theta3)
 
-                @inline inv(r::$RotType) = $InvRotType(-r.theta3, -r.theta2, -r.theta1)
+                @inline Base.inv(r::$RotType) = $InvRotType(-r.theta3, -r.theta2, -r.theta1)
 
                 # define null rotations for convenience
-                @inline one(::Type{$RotType}) = $RotType(0.0, 0.0, 0.0)
-                @inline one(::Type{$RotType{T}}) where {T} = $RotType{T}(zero(T), zero(T), zero(T))
+                @inline Base.one(::Type{$RotType}) = $RotType(0.0, 0.0, 0.0)
+                @inline Base.one(::Type{$RotType{T}}) where {T} = $RotType{T}(zero(T), zero(T), zero(T))
             end
         end
     end
@@ -566,7 +566,7 @@ RotXYX
         atan(- R[2, 3]*ct1 - R[3, 3]*st1, R[2, 2]*ct1 + R[3, 2]*st1))
 end
 
-@inline function Tuple(r::RotXYX{T}) where T
+@inline function Base.Tuple(r::RotXYX{T}) where T
     sinθ₁, cosθ₁ = sincos(r.theta1)
     sinθ₂, cosθ₂ = sincos(r.theta2)
     sinθ₃, cosθ₃ = sincos(r.theta3)
@@ -617,7 +617,7 @@ RotXZX
         atan(R[3, 2]*ct1 - R[2, 2]*st1, R[3, 3]*ct1 - R[2, 3]*st1))
 end
 
-@inline function Tuple(r::RotXZX{T}) where T
+@inline function Base.Tuple(r::RotXZX{T}) where T
     sinθ₁, cosθ₁ = sincos(r.theta1)
     sinθ₂, cosθ₂ = sincos(r.theta2)
     sinθ₃, cosθ₃ = sincos(r.theta3)
@@ -668,7 +668,7 @@ RotYXY
         atan(R[1, 3]*ct1 - R[3, 3]*st1, R[1, 1]*ct1 - R[3, 1]*st1))
 end
 
-@inline function Tuple(r::RotYXY{T}) where T
+@inline function Base.Tuple(r::RotYXY{T}) where T
     sinθ₁, cosθ₁ = sincos(r.theta1)
     sinθ₂, cosθ₂ = sincos(r.theta2)
     sinθ₃, cosθ₃ = sincos(r.theta3)
@@ -719,7 +719,7 @@ RotYZY
         atan(- R[3, 1]*ct1 - R[1, 1]*st1, R[3, 3]*ct1 + R[1, 3]*st1))
 end
 
-@inline function Tuple(r::RotYZY{T}) where T
+@inline function Base.Tuple(r::RotYZY{T}) where T
     sinθ₁, cosθ₁ = sincos(r.theta1)
     sinθ₂, cosθ₂ = sincos(r.theta2)
     sinθ₃, cosθ₃ = sincos(r.theta3)
@@ -770,7 +770,7 @@ RotZXZ
         atan(- R[1, 2]*ct1 - R[2, 2]*st1, R[1, 1]*ct1 + R[2, 1]*st1))
 end
 
-@inline function Tuple(r::RotZXZ{T}) where T
+@inline function Base.Tuple(r::RotZXZ{T}) where T
     sinθ₁, cosθ₁ = sincos(r.theta1)
     sinθ₂, cosθ₂ = sincos(r.theta2)
     sinθ₃, cosθ₃ = sincos(r.theta3)
@@ -821,7 +821,7 @@ RotZYZ
         atan(R[2, 1]*ct1 - R[1, 1]*st1, R[2, 2]*ct1 - R[1, 2]*st1))
 end
 
-@inline function Tuple(r::RotZYZ{T}) where T
+@inline function Base.Tuple(r::RotZYZ{T}) where T
     sinθ₁, cosθ₁ = sincos(r.theta1)
     sinθ₂, cosθ₂ = sincos(r.theta2)
     sinθ₃, cosθ₃ = sincos(r.theta3)
@@ -882,7 +882,7 @@ RotXYZ
         atan(R[2, 1]*ct1 + R[3, 1]*st1, R[2, 2]*ct1 + R[3, 2]*st1))
 end
 
-@inline function Tuple(r::RotXYZ{T}) where T
+@inline function Base.Tuple(r::RotXYZ{T}) where T
     sinθ₁, cosθ₁ = sincos(r.theta1)
     sinθ₂, cosθ₂ = sincos(r.theta2)
     sinθ₃, cosθ₃ = sincos(r.theta3)
@@ -940,7 +940,7 @@ RotZYX
         atan(R[1, 3]*st1 - R[2, 3]*ct1, R[2, 2]*ct1 - R[1, 2]*st1))
 end
 
-@inline function Tuple(r::RotZYX{T}) where T
+@inline function Base.Tuple(r::RotZYX{T}) where T
     sinθ₁, cosθ₁ = sincos(r.theta1)
     sinθ₂, cosθ₂ = sincos(r.theta2)
     sinθ₃, cosθ₃ = sincos(r.theta3)
@@ -998,7 +998,7 @@ RotXZY
         atan(R[2, 1]*st1 - R[3, 1]*ct1, R[3, 3]*ct1 - R[2, 3]*st1))
 end
 
-@inline function Tuple(r::RotXZY{T}) where T
+@inline function Base.Tuple(r::RotXZY{T}) where T
     sinθ₁, cosθ₁ = sincos(r.theta1)
     sinθ₂, cosθ₂ = sincos(r.theta2)
     sinθ₃, cosθ₃ = sincos(r.theta3)
@@ -1056,7 +1056,7 @@ RotYZX
         atan(R[3, 2]*ct1 + R[1, 2]*st1, R[3, 3]*ct1 + R[1, 3]*st1))
 end
 
-@inline function Tuple(r::RotYZX{T}) where T
+@inline function Base.Tuple(r::RotYZX{T}) where T
     sinθ₁, cosθ₁ = sincos(r.theta1)
     sinθ₂, cosθ₂ = sincos(r.theta2)
     sinθ₃, cosθ₃ = sincos(r.theta3)
@@ -1114,7 +1114,7 @@ RotYXZ
         atan(R[3, 2]*st1 - R[1, 2]*ct1, R[1, 1]*ct1 - R[3, 1]*st1))
 end
 
-@inline function Tuple(r::RotYXZ{T}) where T
+@inline function Base.Tuple(r::RotYXZ{T}) where T
     sinθ₁, cosθ₁ = sincos(r.theta1)
     sinθ₂, cosθ₂ = sincos(r.theta2)
     sinθ₃, cosθ₃ = sincos(r.theta3)
@@ -1172,7 +1172,7 @@ RotZXY
         atan(R[1, 3]*ct1 + R[2, 3]*st1, R[1, 1]*ct1 + R[2, 1]*st1))
 end
 
-@inline function Tuple(r::RotZXY{T}) where T
+@inline function Base.Tuple(r::RotZXY{T}) where T
     sinθ₁, cosθ₁ = sincos(r.theta1)
     sinθ₂, cosθ₂ = sincos(r.theta2)
     sinθ₃, cosθ₃ = sincos(r.theta3)

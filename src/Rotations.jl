@@ -6,9 +6,7 @@ module Rotations
 using LinearAlgebra
 using StaticArrays
 
-import Base: convert, eltype, size, length, getindex, *, Tuple, one
-
-import Statistics: mean
+import Statistics
 
 include("util.jl")
 include("core_types.jl")

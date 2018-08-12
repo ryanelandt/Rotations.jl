@@ -95,7 +95,7 @@ for N = 2:3
     end
 end
 Base.@propagate_inbounds Base.getindex(r::RotMatrix, i::Int) = r.mat[i]
-@inline Tuple(r::RotMatrix) = Tuple(r.mat)
+@inline Base.Tuple(r::RotMatrix) = Tuple(r.mat)
 
 @inline RotMatrix(θ::Real) = RotMatrix{2}(θ)
 @inline function (::Type{RotMatrix{2}})(θ::Real)
@@ -108,16 +108,16 @@ end
 end
 
 # A rotation is more-or-less defined as being an orthogonal (or unitary) matrix
-inv(r::RotMatrix) = RotMatrix(r.mat')
+Base.inv(r::RotMatrix) = RotMatrix(r.mat')
 
 # By default, composition of rotations will go through RotMatrix, unless overridden
-@inline *(r1::Rotation, r2::Rotation) = RotMatrix(r1) * RotMatrix(r2)
-@inline *(r1::RotMatrix, r2::Rotation) = r1 * RotMatrix(r2)
-@inline *(r1::Rotation, r2::RotMatrix) = RotMatrix(r1) * r2
-@inline *(r1::RotMatrix, r2::RotMatrix) = RotMatrix(r1.mat * r2.mat) # TODO check that this doesn't involve extra copying.
+@inline Base.:*(r1::Rotation, r2::Rotation) = RotMatrix(r1) * RotMatrix(r2)
+@inline Base.:*(r1::RotMatrix, r2::Rotation) = r1 * RotMatrix(r2)
+@inline Base.:*(r1::Rotation, r2::RotMatrix) = RotMatrix(r1) * r2
+@inline Base.:*(r1::RotMatrix, r2::RotMatrix) = RotMatrix(r1.mat * r2.mat) # TODO check that this doesn't involve extra copying.
 
 # Special case multiplication of 3×3 rotation matrices: speedup using cross product
-@inline function *(r1::RotMatrix{3}, r2::RotMatrix{3})
+@inline function Base.:*(r1::RotMatrix{3}, r2::RotMatrix{3})
     ret12 = r1 * r2[:, SVector(1, 2)]
     ret3 = ret12[:, 1] × ret12[:, 2]
     RotMatrix([ret12 ret3])

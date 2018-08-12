@@ -99,24 +99,16 @@ Base.@propagate_inbounds Base.getindex(r::RotMatrix, i::Int) = r.mat[i]
 
 @inline RotMatrix(θ::Real) = RotMatrix{2}(θ)
 @inline function (::Type{RotMatrix{2}})(θ::Real)
-    s, c = _sincos(θ)
+    s, c = sincos(θ)
     RotMatrix(@SMatrix [c -s; s c])
 end
 @inline function RotMatrix{2,T}(θ::Real) where T
-    s, c = _sincos(θ)
+    s, c = sincos(θ)
     RotMatrix(@SMatrix T[c -s; s c])
 end
 
 # A rotation is more-or-less defined as being an orthogonal (or unitary) matrix
 inv(r::RotMatrix) = RotMatrix(r.mat')
-
-if VERSION < v"0.7-"
-    eye(::Type{RotMatrix{N}}) where {N} = one(RotMatrix{N})
-    eye(::Type{RotMatrix{N,T}}) where {N,T} = one(RotMatrix{N,T})
-elseif isdefined(LinearAlgebra, :eye)
-    Base.@deprecate eye(::Type{RotMatrix{N}}) where {N} one(RotMatrix{N})
-    Base.@deprecate eye(::Type{RotMatrix{N,T}}) where {N,T} one(RotMatrix{N,T})
-end
 
 # By default, composition of rotations will go through RotMatrix, unless overridden
 @inline *(r1::Rotation, r2::Rotation) = RotMatrix(r1) * RotMatrix(r2)
@@ -160,72 +152,28 @@ function isrotation(r::AbstractMatrix{T}, tol::Real = 1000 * eps(eltype(T))) whe
     return d < tol
 end
 
-@static if VERSION < v"0.7-"
-    # A simplification and specialization of the Base.showarray() function makes
-    # everything sensible at the REPL.
-    function Base.showarray(io::IO, X::Rotation, repr::Bool = true; header = true)
-        if !haskey(io, :compact)
-            io = IOContext(io, compact=true)
-        end
-        if repr
-            if isa(X, RotMatrix)
-                Base.print_matrix_repr(io, X)
-            else
-                print(io, typeof(X).name.name)
-                n_fields = length(fieldnames(typeof(X)))
-                print(io, "(")
-                for i = 1:n_fields
-                    print(io, getfield(X, i))
-                    if i < n_fields
-                        print(io, ", ")
-                    end
-                end
-                print(io, ")")
-            end
-        else
-            if header
-                print(io, summary(X))
-                if !isa(X, RotMatrix)
-                    n_fields = length(fieldnames(typeof(X)))
-                    print(io, "(")
-                    for i = 1:n_fields
-                        print(io, getfield(X, i))
-                        if i < n_fields
-                            print(io, ", ")
-                        end
-                    end
-                    print(io, ")")
-                end
-                println(io, ":")
-            end
-            punct = (" ", "  ", "")
-            Base.print_matrix(io, X, punct...)
-        end
+# A simplification and specialization of the Base.show function for AbstractArray makes
+# everything sensible at the REPL.
+function Base.show(io::IO, ::MIME"text/plain", X::Rotation)
+    if !haskey(io, :compact)
+        io = IOContext(io, :compact => true)
     end
-else
-    # A simplification and specialization of the Base.show function for AbstractArray makes
-    # everything sensible at the REPL.
-    function Base.show(io::IO, ::MIME"text/plain", X::Rotation)
-        if !haskey(io, :compact)
-            io = IOContext(io, :compact => true)
-        end
-        summary(io, X)
-        if !isa(X, RotMatrix)
-            n_fields = length(fieldnames(typeof(X)))
-            print(io, "(")
-            for i = 1:n_fields
-                print(io, getfield(X, i))
-                if i < n_fields
-                    print(io, ", ")
-                end
+    summary(io, X)
+    if !isa(X, RotMatrix)
+        n_fields = length(fieldnames(typeof(X)))
+        print(io, "(")
+        for i = 1:n_fields
+            print(io, getfield(X, i))
+            if i < n_fields
+                print(io, ", ")
             end
-            print(io, ")")
         end
-        print(io, ":")
-        println(io)
-        io = IOContext(io, :typeinfo => eltype(X))
-        Base.print_array(io, X)
+        print(io, ")")
     end
+    print(io, ":")
+    println(io)
+    io = IOContext(io, :typeinfo => eltype(X))
+    Base.print_array(io, X)
 end
 
 # Removes module name from output, to match other types

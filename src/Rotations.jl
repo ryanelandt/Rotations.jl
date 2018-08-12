@@ -3,6 +3,7 @@ __precompile__(true)
 
 module Rotations
 
+using LinearAlgebra
 using StaticArrays
 
 import Base: convert, eltype, size, length, getindex, *, Tuple, one

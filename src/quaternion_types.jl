@@ -195,14 +195,6 @@ end
 @inline one(::Type{Quat}) = Quat(1.0, 0.0, 0.0, 0.0)
 @inline one(::Type{Quat{T}}) where {T} = Quat{T}(one(T), zero(T), zero(T), zero(T))
 
-if VERSION < v"0.7-"
-    eye(::Type{Quat}) = one(Quat)
-    eye(::Type{Quat{T}}) where {T} = one(Quat{T})
-elseif isdefined(LinearAlgebra, :eye)
-    Base.@deprecate eye(::Type{Quat}) one(Quat)
-    Base.@deprecate eye(::Type{Quat{T}}) where {T} one(Quat{T})
-end
-
 """
     rotation_between(from, to)
 
@@ -286,14 +278,6 @@ end
 
 @inline one(::Type{SPQuat}) = SPQuat(0.0, 0.0, 0.0)
 @inline one(::Type{SPQuat{T}}) where {T} = SPQuat{T}(zero(T), zero(T), zero(T))
-
-if VERSION < v"0.7-"
-    eye(::Type{SPQuat}) = one(SPQuat)
-    eye(::Type{SPQuat{T}}) where {T} = one(SPQuat{T})
-elseif isdefined(LinearAlgebra, :eye)
-    Base.@deprecate eye(::Type{SPQuat}) one(SPQuat)
-    Base.@deprecate eye(::Type{SPQuat{T}}) where {T} one(SPQuat{T})
-end
 
 # rotation properties
 @inline rotation_angle(spq::SPQuat) = rotation_angle(Quat(spq))

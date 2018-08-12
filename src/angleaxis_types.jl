@@ -52,7 +52,7 @@ end
     # Rodrigues' rotation formula.
     T = eltype(aa)
 
-    s, c = _sincos(aa.theta)
+    s, c = sincos(aa.theta)
     c1 = one(T) - c
 
     c1x2 = c1 * aa.axis_x^2
@@ -74,7 +74,7 @@ end
 end
 
 @inline function Base.convert(::Type{Q}, aa::AngleAxis) where Q <: Quat
-    s, c = _sincos(aa.theta / 2)
+    s, c = sincos(aa.theta / 2)
     return Q(c, s * aa.axis_x, s * aa.axis_y, s * aa.axis_z, false)
 end
 
@@ -93,7 +93,7 @@ function Base.:*(aa::AngleAxis, v::StaticVector)
     end
 
     w = rotation_axis(aa)
-    st, ct = _sincos(aa.theta)
+    st, ct = sincos(aa.theta)
     w_cross_pt = cross(w, v)
     m = dot(v, w) * (one(w_cross_pt[1]) - ct)
     T = promote_type(eltype(aa), eltype(v))
@@ -118,14 +118,6 @@ end
 # define null rotations for convenience
 @inline Base.one(::Type{AngleAxis}) = AngleAxis(0.0, 1.0, 0.0, 0.0)
 @inline Base.one(::Type{AngleAxis{T}}) where {T} = AngleAxis{T}(zero(T), one(T), zero(T), zero(T))
-
-if VERSION < v"0.7-"
-    eye(::Type{AngleAxis}) = one(AngleAxis)
-    eye(::Type{AngleAxis{T}}) where {T} = one(AngleAxis{T})
-elseif isdefined(LinearAlgebra, :eye)
-    Base.@deprecate eye(::Type{AngleAxis}) one(AngleAxis)
-    Base.@deprecate eye(::Type{AngleAxis{T}}) where {T} one(AngleAxis{T})
-end
 
 # accessors
 @inline rotation_angle(aa::AngleAxis) = aa.theta #  - floor((aa.theta+pi) / (2*pi)) * 2*pi
@@ -230,11 +222,3 @@ end
 # define null rotations for convenience
 @inline Base.one(::Type{RodriguesVec}) = RodriguesVec(0.0, 0.0, 0.0)
 @inline Base.one(::Type{RodriguesVec{T}}) where {T} = RodriguesVec{T}(zero(T), zero(T), zero(T))
-
-if VERSION < v"0.7-"
-    eye(::Type{RodriguesVec}) = one(RodriguesVec)
-    eye(::Type{RodriguesVec{T}}) where {T} = one(RodriguesVec{T})
-elseif isdefined(LinearAlgebra, :eye)
-    Base.@deprecate eye(::Type{RodriguesVec}) one(RodriguesVec)
-    Base.@deprecate eye(::Type{RodriguesVec{T}}) where {T} one(RodriguesVec{T})
-end

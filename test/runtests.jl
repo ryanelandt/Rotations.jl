@@ -1,10 +1,9 @@
-using Compat
-using Compat.Test
-using Compat.LinearAlgebra
+using Test
+using LinearAlgebra
 using Rotations
 using StaticArrays
 
-import Compat.Random: srand
+import Random
 
 # Check that there are no ambiguities beyond those present in StaticArrays
 ramb = detect_ambiguities(Rotations, Base, Core)

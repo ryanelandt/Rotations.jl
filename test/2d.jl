@@ -1,4 +1,4 @@
-using Rotations, StaticArrays, Compat.Test
+using Rotations, StaticArrays, Test
 
 @testset "2d Rotations" begin
 
@@ -34,7 +34,7 @@ using Rotations, StaticArrays, Compat.Test
         repeats = 100
         R = RotMatrix{2,Float64}
         I = one(R)
-        srand(0)
+        Random.seed!(0)
         for i = 1:repeats
             r = rand(R)
             @test isrotation(r)
@@ -53,7 +53,7 @@ using Rotations, StaticArrays, Compat.Test
     @testset "Rotate Points" begin
         repeats = 100
         R = RotMatrix{2}
-        srand(0)
+        Random.seed!(0)
         for i = 1:repeats
             r = rand(R)
             m = SMatrix(r)
@@ -74,7 +74,7 @@ using Rotations, StaticArrays, Compat.Test
     @testset "Compose rotations" begin
         repeats = 100
         R = RotMatrix{2}
-        srand(0)
+        Random.seed!(0)
         for i = 1:repeats
             r1 = rand(R)
             m1 = SMatrix(r1)
@@ -97,7 +97,7 @@ using Rotations, StaticArrays, Compat.Test
     @testset "Convert rotations" begin
         repeats = 100
         R = RotMatrix{2}
-        srand(0)
+        Random.seed!(0)
         r1 = rand(R)
         @test R(r1) == r1
     end

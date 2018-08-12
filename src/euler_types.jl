@@ -21,29 +21,18 @@ for axis in [:X, :Y, :Z]
         @inline $RotType(theta::T) where {T} = $RotType{T}(theta)
         @inline $RotType(r::$RotType{T}) where {T} = $RotType{T}(r)
 
-        @inline convert(::Type{R}, r::$RotType) where {R<:$RotType} = R(r)
-        @inline convert(::Type{R}, r::R) where {R<:$RotType} = r
+        @inline Base.convert(::Type{R}, r::$RotType) where {R<:$RotType} = R(r)
+        @inline Base.convert(::Type{R}, r::R) where {R<:$RotType} = r
 
         @inline (::Type{R})(t::NTuple{9}) where {R<:$RotType} = error("Cannot construct a cardinal axis rotation from a matrix")
 
         @inline Base.:*(r1::$RotType, r2::$RotType) = $RotType(r1.theta + r2.theta)
 
-        @inline inv(r::$RotType) = $RotType(-r.theta)
+        @inline Base.inv(r::$RotType) = $RotType(-r.theta)
 
         # define null rotations for convenience
-        @inline one(::Type{$RotType}) = $RotType(0.0)
-        @inline one(::Type{$RotType{T}}) where {T} = $RotType{T}(zero(T))
-    end
-    if VERSION < v"0.7-"
-        @eval begin
-            eye(::Type{$RotType}) = one($RotType)
-            eye(::Type{$RotType{T}}) where {T} = one($RotType{T})
-        end
-    elseif isdefined(LinearAlgebra, :eye)
-        @eval begin
-            Base.@deprecate eye(::Type{$RotType}) one($RotType)
-            Base.@deprecate eye(::Type{$RotType{T}}) where {T} one($RotType{T})
-        end
+        @inline Base.one(::Type{$RotType}) = $RotType(0.0)
+        @inline Base.one(::Type{$RotType{T}}) where {T} = $RotType{T}(zero(T))
     end
 end
 
@@ -86,8 +75,8 @@ RotX
     end
 end
 
-@inline function Tuple(r::RotX{T}) where T
-    s, c = _sincos(r.theta)
+@inline function Base.Tuple(r::RotX{T}) where T
+    s, c = sincos(r.theta)
     o = one(s)
     z = zero(s)
     (o,  z,  z,   # transposed representation
@@ -100,7 +89,7 @@ end
         throw("Dimension mismatch: cannot rotate a vector of length $(length(v))")
     end
 
-    st, ct = _sincos(r.theta)
+    st, ct = sincos(r.theta)
     T = Base.promote_op(*, typeof(st), eltype(v))
     return similar_type(v,T)(v[1],
                              v[2] * ct - v[3] * st,
@@ -141,8 +130,8 @@ RotY
     end
 end
 
-@inline function Tuple(r::RotY{T}) where T
-    s, c = _sincos(r.theta)
+@inline function Base.Tuple(r::RotY{T}) where T
+    s, c = sincos(r.theta)
     o = one(s)
     z = zero(s)
     (c,  z, -s,   # transposed representation
@@ -155,7 +144,7 @@ end
         throw("Dimension mismatch: cannot rotate a vector of length $(length(v))")
     end
 
-    st, ct = _sincos(r.theta)
+    st, ct = sincos(r.theta)
     T = Base.promote_op(*, typeof(st), eltype(v))
     return similar_type(v,T)(v[1] * ct + v[3] * st,
                              v[2],
@@ -192,8 +181,8 @@ RotZ
     end
 end
 
-@inline function Tuple(r::RotZ{T}) where T
-    s, c = _sincos(r.theta)
+@inline function Base.Tuple(r::RotZ{T}) where T
+    s, c = sincos(r.theta)
     o = one(s)
     z = zero(s)
     ( c, s, z,   # transposed representation
@@ -206,7 +195,7 @@ end
         throw("Dimension mismatch: cannot rotate a vector of length $(length(v))")
     end
 
-    st, ct = _sincos(r.theta)
+    st, ct = sincos(r.theta)
     T = Base.promote_op(*, typeof(st), eltype(v))
     return similar_type(v,T)(v[1] * ct - v[2] * st,
                              v[2] * ct + v[1] * st,
@@ -239,8 +228,8 @@ for axis1 in [:X, :Y, :Z]
             @inline $RotType(theta1::T1, theta2::T2) where {T1, T2} = $RotType{promote_type(T1, T2)}(theta1, theta2)
             @inline $RotType(r::$RotType{T}) where {T} = $RotType{T}(r)
 
-            @inline convert(::Type{R}, r::$RotType) where {R<:$RotType} = R(r)
-            @inline convert(::Type{R}, r::R) where {R<:$RotType} = r
+            @inline Base.convert(::Type{R}, r::$RotType) where {R<:$RotType} = R(r)
+            @inline Base.convert(::Type{R}, r::R) where {R<:$RotType} = r
 
             @inline function Base.getindex(r::$RotType{T}, i::Int) where T
                 Tuple(r)[i] # Slow...
@@ -255,22 +244,11 @@ for axis1 in [:X, :Y, :Z]
             @inline Base.:*(r1::$RotType, r2::$Rot2Type) = $RotType(r1.theta1, r1.theta2 + r2.theta)
             @inline Base.:*(r1::$Rot1Type, r2::$RotType) = $RotType(r1.theta + r2.theta1, r2.theta2)
 
-            @inline inv(r::$RotType) = $InvRotType(-r.theta2, -r.theta1)
+            @inline Base.inv(r::$RotType) = $InvRotType(-r.theta2, -r.theta1)
 
             # define null rotations for convenience
-            @inline one(::Type{$RotType}) = $RotType(0.0, 0.0)
-            @inline one(::Type{$RotType{T}}) where {T} = $RotType{T}(zero(T), zero(T))
-        end
-        if VERSION < v"0.7-"
-            @eval begin
-                eye(::Type{$RotType}) = one($RotType)
-                eye(::Type{$RotType{T}}) where {T} = one($RotType{T})
-            end
-        elseif isdefined(LinearAlgebra, :eye)
-            @eval begin
-                Base.@deprecate eye(::Type{$RotType}) one($RotType)
-                Base.@deprecate eye(::Type{$RotType{T}}) where {T} one($RotType{T})
-            end
+            @inline Base.one(::Type{$RotType}) = $RotType(0.0, 0.0)
+            @inline Base.one(::Type{$RotType{T}}) where {T} = $RotType{T}(zero(T), zero(T))
         end
     end
 end
@@ -297,9 +275,9 @@ followed by a rotation by `theta_x` about the X axis.
 """
 RotXY
 
-@inline function Tuple(r::RotXY{T}) where T
-    sinθ₁, cosθ₁ = _sincos(r.theta1)
-    sinθ₂, cosθ₂ = _sincos(r.theta2)
+@inline function Base.Tuple(r::RotXY{T}) where T
+    sinθ₁, cosθ₁ = sincos(r.theta1)
+    sinθ₂, cosθ₂ = sincos(r.theta2)
     z = zero(sinθ₁)
 
     # transposed representation
@@ -313,8 +291,8 @@ end
         throw("Dimension mismatch: cannot rotate a vector of length $(length(v))")
     end
 
-    sinθ₁, cosθ₁ = _sincos(r.theta1)
-    sinθ₂, cosθ₂ = _sincos(r.theta2)
+    sinθ₁, cosθ₁ = sincos(r.theta1)
+    sinθ₂, cosθ₂ = sincos(r.theta2)
 
     T = Base.promote_op(*, typeof(sinθ₁), eltype(v))
 
@@ -333,9 +311,9 @@ followed by a rotation by `theta_y` about the Y axis.
 """
 RotYX
 
-@inline function Tuple(r::RotYX{T}) where T
-    sinθ₁, cosθ₁ = _sincos(r.theta1)
-    sinθ₂, cosθ₂ = _sincos(r.theta2)
+@inline function Base.Tuple(r::RotYX{T}) where T
+    sinθ₁, cosθ₁ = sincos(r.theta1)
+    sinθ₂, cosθ₂ = sincos(r.theta2)
     z = zero(sinθ₁)
 
     # transposed representation
@@ -349,8 +327,8 @@ end
         throw("Dimension mismatch: cannot rotate a vector of length $(length(v))")
     end
 
-    sinθ₁, cosθ₁ = _sincos(r.theta1)
-    sinθ₂, cosθ₂ = _sincos(r.theta2)
+    sinθ₁, cosθ₁ = sincos(r.theta1)
+    sinθ₂, cosθ₂ = sincos(r.theta2)
 
     T = Base.promote_op(*, typeof(sinθ₁), eltype(v))
 
@@ -369,9 +347,9 @@ followed by a rotation by `theta_x` about the X axis.
 """
 RotXZ
 
-@inline function Tuple(r::RotXZ{T}) where T
-    sinθ₁, cosθ₁ = _sincos(r.theta1)
-    sinθ₂, cosθ₂ = _sincos(r.theta2)
+@inline function Base.Tuple(r::RotXZ{T}) where T
+    sinθ₁, cosθ₁ = sincos(r.theta1)
+    sinθ₂, cosθ₂ = sincos(r.theta2)
     z = zero(sinθ₁)
 
     # transposed representation
@@ -385,8 +363,8 @@ end
         throw("Dimension mismatch: cannot rotate a vector of length $(length(v))")
     end
 
-    sinθ₁, cosθ₁ = _sincos(r.theta1)
-    sinθ₂, cosθ₂ = _sincos(r.theta2)
+    sinθ₁, cosθ₁ = sincos(r.theta1)
+    sinθ₂, cosθ₂ = sincos(r.theta2)
 
     T = Base.promote_op(*, typeof(sinθ₁), eltype(v))
 
@@ -405,9 +383,9 @@ followed by a rotation by `theta_z` about the Z axis.
 """
 RotZX
 
-@inline function Tuple(r::RotZX{T}) where T
-    sinθ₁, cosθ₁ = _sincos(r.theta1)
-    sinθ₂, cosθ₂ = _sincos(r.theta2)
+@inline function Base.Tuple(r::RotZX{T}) where T
+    sinθ₁, cosθ₁ = sincos(r.theta1)
+    sinθ₂, cosθ₂ = sincos(r.theta2)
     z = zero(sinθ₁)
 
     # transposed representation
@@ -421,8 +399,8 @@ end
         throw("Dimension mismatch: cannot rotate a vector of length $(length(v))")
     end
 
-    sinθ₁, cosθ₁ = _sincos(r.theta1)
-    sinθ₂, cosθ₂ = _sincos(r.theta2)
+    sinθ₁, cosθ₁ = sincos(r.theta1)
+    sinθ₂, cosθ₂ = sincos(r.theta2)
 
     T = Base.promote_op(*, typeof(sinθ₁), eltype(v))
 
@@ -441,9 +419,9 @@ followed by a rotation by `theta_z` about the Z axis.
 """
 RotZY
 
-@inline function Tuple(r::RotZY{T}) where T
-    sinθ₁, cosθ₁ = _sincos(r.theta1)
-    sinθ₂, cosθ₂ = _sincos(r.theta2)
+@inline function Base.Tuple(r::RotZY{T}) where T
+    sinθ₁, cosθ₁ = sincos(r.theta1)
+    sinθ₂, cosθ₂ = sincos(r.theta2)
     z = zero(sinθ₁)
 
     # transposed representation
@@ -457,8 +435,8 @@ end
         throw("Dimension mismatch: cannot rotate a vector of length $(length(v))")
     end
 
-    sinθ₁, cosθ₁ = _sincos(r.theta1)
-    sinθ₂, cosθ₂ = _sincos(r.theta2)
+    sinθ₁, cosθ₁ = sincos(r.theta1)
+    sinθ₂, cosθ₂ = sincos(r.theta2)
 
     T = Base.promote_op(*, typeof(sinθ₁), eltype(v))
 
@@ -477,9 +455,9 @@ followed by a rotation by `theta_y` about the Y axis.
 """
 RotYZ
 
-@inline function Tuple(r::RotYZ{T}) where T
-    sinθ₁, cosθ₁ = _sincos(r.theta1)
-    sinθ₂, cosθ₂ = _sincos(r.theta2)
+@inline function Base.Tuple(r::RotYZ{T}) where T
+    sinθ₁, cosθ₁ = sincos(r.theta1)
+    sinθ₂, cosθ₂ = sincos(r.theta2)
     z = zero(sinθ₁)
 
     # transposed representation
@@ -493,8 +471,8 @@ end
         throw("Dimension mismatch: cannot rotate a vector of length $(length(v))")
     end
 
-    sinθ₁, cosθ₁ = _sincos(r.theta1)
-    sinθ₂, cosθ₂ = _sincos(r.theta2)
+    sinθ₁, cosθ₁ = sincos(r.theta1)
+    sinθ₂, cosθ₂ = sincos(r.theta2)
 
     T = Base.promote_op(*, typeof(sinθ₁), eltype(v))
 
@@ -533,8 +511,8 @@ for axis1 in [:X, :Y, :Z]
                 @inline $RotType(theta1::T1, theta2::T2, theta3::T3) where {T1, T2, T3} = $RotType{promote_type(promote_type(T1, T2), T3)}(theta1, theta2, theta3)
                 @inline $RotType(r::$RotType{T}) where {T} = $RotType{T}(r)
 
-                @inline convert(::Type{R}, r::$RotType) where {R<:$RotType} = R(r)
-                @inline convert(::Type{R}, r::R) where {R<:$RotType} = r
+                @inline Base.convert(::Type{R}, r::$RotType) where {R<:$RotType} = R(r)
+                @inline Base.convert(::Type{R}, r::R) where {R<:$RotType} = r
 
                 @inline function Base.getindex(r::$RotType{T}, i::Int) where T
                     Tuple(r)[i] # Slow...
@@ -548,22 +526,11 @@ for axis1 in [:X, :Y, :Z]
                 @inline Base.:*(r1::$RotType, r2::$Rot3Type) = $RotType(r1.theta1, r1.theta2, r1.theta3 + r2.theta)
                 @inline Base.:*(r1::$Rot1Type, r2::$RotType) = $RotType(r1.theta + r2.theta1, r2.theta2, r2.theta3)
 
-                @inline inv(r::$RotType) = $InvRotType(-r.theta3, -r.theta2, -r.theta1)
+                @inline Base.inv(r::$RotType) = $InvRotType(-r.theta3, -r.theta2, -r.theta1)
 
                 # define null rotations for convenience
-                @inline one(::Type{$RotType}) = $RotType(0.0, 0.0, 0.0)
-                @inline one(::Type{$RotType{T}}) where {T} = $RotType{T}(zero(T), zero(T), zero(T))
-            end
-            if VERSION < v"0.7-"
-                @eval begin
-                    eye(::Type{$RotType}) = one($RotType)
-                    eye(::Type{$RotType{T}}) where {T} = one($RotType{T})
-                end
-            else
-                @eval begin
-                    Base.@deprecate eye(::Type{$RotType}) one($RotType)
-                    Base.@deprecate eye(::Type{$RotType{T}}) where {T} one($RotType{T})
-                end
+                @inline Base.one(::Type{$RotType}) = $RotType(0.0, 0.0, 0.0)
+                @inline Base.one(::Type{$RotType{T}}) where {T} = $RotType{T}(zero(T), zero(T), zero(T))
             end
         end
     end
@@ -592,17 +559,17 @@ RotXYX
     R = SMatrix{3,3}(t)
 
     t1 = atan(R[2, 1], (-R[3, 1] + eps(t[1])) - eps(t[1]))  # TODO: handle denormal numbers better, as atan(0,0) != atan(0,-0)
-    st1, ct1 = _sincos(t1)
+    st1, ct1 = sincos(t1)
 
     Rot(t1,
         atan((R[1, 2] * R[1, 2] + R[1, 3] * R[1, 3])^(1/2), R[1, 1]),
         atan(- R[2, 3]*ct1 - R[3, 3]*st1, R[2, 2]*ct1 + R[3, 2]*st1))
 end
 
-@inline function Tuple(r::RotXYX{T}) where T
-    sinθ₁, cosθ₁ = _sincos(r.theta1)
-    sinθ₂, cosθ₂ = _sincos(r.theta2)
-    sinθ₃, cosθ₃ = _sincos(r.theta3)
+@inline function Base.Tuple(r::RotXYX{T}) where T
+    sinθ₁, cosθ₁ = sincos(r.theta1)
+    sinθ₂, cosθ₂ = sincos(r.theta2)
+    sinθ₃, cosθ₃ = sincos(r.theta3)
 
     # transposed representation
     (cosθ₂,        sinθ₁*sinθ₂,                        cosθ₁*-sinθ₂,
@@ -615,9 +582,9 @@ end
         throw("Dimension mismatch: cannot rotate a vector of length $(length(v))")
     end
 
-    sinθ₁, cosθ₁ = _sincos(r.theta1)
-    sinθ₂, cosθ₂ = _sincos(r.theta2)
-    sinθ₃, cosθ₃ = _sincos(r.theta3)
+    sinθ₁, cosθ₁ = sincos(r.theta1)
+    sinθ₂, cosθ₂ = sincos(r.theta2)
+    sinθ₃, cosθ₃ = sincos(r.theta3)
 
     T = Base.promote_op(*, typeof(sinθ₁), eltype(v))
 
@@ -643,17 +610,17 @@ RotXZX
     R = SMatrix{3,3}(t)
 
     t1 = atan(R[3, 1], R[2, 1])
-    st1, ct1 = _sincos(t1)
+    st1, ct1 = sincos(t1)
 
     Rot(t1,
         atan((R[1, 2] * R[1, 2] + R[1, 3] * R[1, 3])^(1/2), R[1, 1]),
         atan(R[3, 2]*ct1 - R[2, 2]*st1, R[3, 3]*ct1 - R[2, 3]*st1))
 end
 
-@inline function Tuple(r::RotXZX{T}) where T
-    sinθ₁, cosθ₁ = _sincos(r.theta1)
-    sinθ₂, cosθ₂ = _sincos(r.theta2)
-    sinθ₃, cosθ₃ = _sincos(r.theta3)
+@inline function Base.Tuple(r::RotXZX{T}) where T
+    sinθ₁, cosθ₁ = sincos(r.theta1)
+    sinθ₂, cosθ₂ = sincos(r.theta2)
+    sinθ₃, cosθ₃ = sincos(r.theta3)
 
     # transposed representation
     (cosθ₂,         cosθ₁*sinθ₂,                        sinθ₁*sinθ₂,
@@ -666,9 +633,9 @@ end
         throw("Dimension mismatch: cannot rotate a vector of length $(length(v))")
     end
 
-    sinθ₁, cosθ₁ = _sincos(r.theta1)
-    sinθ₂, cosθ₂ = _sincos(r.theta2)
-    sinθ₃, cosθ₃ = _sincos(r.theta3)
+    sinθ₁, cosθ₁ = sincos(r.theta1)
+    sinθ₂, cosθ₂ = sincos(r.theta2)
+    sinθ₃, cosθ₃ = sincos(r.theta3)
 
     T = Base.promote_op(*, typeof(sinθ₁), eltype(v))
 
@@ -694,17 +661,17 @@ RotYXY
     R = SMatrix{3,3}(t)
 
     t1 = atan(R[1, 2], R[3, 2])
-    st1, ct1 = _sincos(t1)
+    st1, ct1 = sincos(t1)
 
     Rot(t1,
         atan((R[2, 1] * R[2, 1] + R[2, 3] * R[2, 3])^(1/2), R[2, 2]),
         atan(R[1, 3]*ct1 - R[3, 3]*st1, R[1, 1]*ct1 - R[3, 1]*st1))
 end
 
-@inline function Tuple(r::RotYXY{T}) where T
-    sinθ₁, cosθ₁ = _sincos(r.theta1)
-    sinθ₂, cosθ₂ = _sincos(r.theta2)
-    sinθ₃, cosθ₃ = _sincos(r.theta3)
+@inline function Base.Tuple(r::RotYXY{T}) where T
+    sinθ₁, cosθ₁ = sincos(r.theta1)
+    sinθ₂, cosθ₂ = sincos(r.theta2)
+    sinθ₃, cosθ₃ = sincos(r.theta3)
 
     # transposed representation
     (cosθ₁*cosθ₃ + sinθ₁*cosθ₂*-sinθ₃,  sinθ₂*sinθ₃,   -sinθ₁*cosθ₃ + cosθ₁*cosθ₂*-sinθ₃,
@@ -717,9 +684,9 @@ end
         throw("Dimension mismatch: cannot rotate a vector of length $(length(v))")
     end
 
-    sinθ₁, cosθ₁ = _sincos(r.theta1)
-    sinθ₂, cosθ₂ = _sincos(r.theta2)
-    sinθ₃, cosθ₃ = _sincos(r.theta3)
+    sinθ₁, cosθ₁ = sincos(r.theta1)
+    sinθ₂, cosθ₂ = sincos(r.theta2)
+    sinθ₃, cosθ₃ = sincos(r.theta3)
 
     T = Base.promote_op(*, typeof(sinθ₁), eltype(v))
 
@@ -745,17 +712,17 @@ RotYZY
     R = SMatrix{3,3}(t)
 
     t1 = atan(R[3, 2], -R[1, 2])  # TODO: handle denormal numbers better, as atan(0,0) != atan(0,-0)
-    st1, ct1 = _sincos(t1)
+    st1, ct1 = sincos(t1)
 
     Rot(t1,
         atan((R[2, 1] * R[2, 1] + R[2, 3] * R[2, 3])^(1/2), R[2, 2]),
         atan(- R[3, 1]*ct1 - R[1, 1]*st1, R[3, 3]*ct1 + R[1, 3]*st1))
 end
 
-@inline function Tuple(r::RotYZY{T}) where T
-    sinθ₁, cosθ₁ = _sincos(r.theta1)
-    sinθ₂, cosθ₂ = _sincos(r.theta2)
-    sinθ₃, cosθ₃ = _sincos(r.theta3)
+@inline function Base.Tuple(r::RotYZY{T}) where T
+    sinθ₁, cosθ₁ = sincos(r.theta1)
+    sinθ₂, cosθ₂ = sincos(r.theta2)
+    sinθ₃, cosθ₃ = sincos(r.theta3)
 
     # transposed representation
     (cosθ₁*cosθ₂*cosθ₃ + sinθ₁*-sinθ₃,  sinθ₂*cosθ₃,  -sinθ₁*cosθ₂*cosθ₃ + cosθ₁*-sinθ₃,
@@ -768,9 +735,9 @@ end
         throw("Dimension mismatch: cannot rotate a vector of length $(length(v))")
     end
 
-    sinθ₁, cosθ₁ = _sincos(r.theta1)
-    sinθ₂, cosθ₂ = _sincos(r.theta2)
-    sinθ₃, cosθ₃ = _sincos(r.theta3)
+    sinθ₁, cosθ₁ = sincos(r.theta1)
+    sinθ₂, cosθ₂ = sincos(r.theta2)
+    sinθ₃, cosθ₃ = sincos(r.theta3)
 
     T = Base.promote_op(*, typeof(sinθ₁), eltype(v))
 
@@ -796,17 +763,17 @@ RotZXZ
     R = SMatrix{3,3}(t)
 
     t1 = atan(R[1, 3], (-R[2, 3] + eps()) - eps())  # TODO: handle denormal numbers better, as atan(0,0) != atan(0,-0)
-    st1, ct1 = _sincos(t1)
+    st1, ct1 = sincos(t1)
 
     Rot(t1,
         atan((R[3, 1] * R[3, 1] + R[3, 2] * R[3, 2])^(1/2), R[3, 3]),
         atan(- R[1, 2]*ct1 - R[2, 2]*st1, R[1, 1]*ct1 + R[2, 1]*st1))
 end
 
-@inline function Tuple(r::RotZXZ{T}) where T
-    sinθ₁, cosθ₁ = _sincos(r.theta1)
-    sinθ₂, cosθ₂ = _sincos(r.theta2)
-    sinθ₃, cosθ₃ = _sincos(r.theta3)
+@inline function Base.Tuple(r::RotZXZ{T}) where T
+    sinθ₁, cosθ₁ = sincos(r.theta1)
+    sinθ₂, cosθ₂ = sincos(r.theta2)
+    sinθ₃, cosθ₃ = sincos(r.theta3)
 
     # transposed representation
     (cosθ₁*cosθ₃ + -sinθ₁*cosθ₂*sinθ₃,   sinθ₁*cosθ₃ + cosθ₁*cosθ₂*sinθ₃,   sinθ₂*sinθ₃,
@@ -819,9 +786,9 @@ end
         throw("Dimension mismatch: cannot rotate a vector of length $(length(v))")
     end
 
-    sinθ₁, cosθ₁ = _sincos(r.theta1)
-    sinθ₂, cosθ₂ = _sincos(r.theta2)
-    sinθ₃, cosθ₃ = _sincos(r.theta3)
+    sinθ₁, cosθ₁ = sincos(r.theta1)
+    sinθ₂, cosθ₂ = sincos(r.theta2)
+    sinθ₃, cosθ₃ = sincos(r.theta3)
 
     T = Base.promote_op(*, typeof(sinθ₁), eltype(v))
 
@@ -847,17 +814,17 @@ RotZYZ
     R = SMatrix{3,3}(t)
 
     t1 = atan(R[2, 3], R[1, 3])
-    st1, ct1 = _sincos(t1)
+    st1, ct1 = sincos(t1)
 
     Rot(t1,
         atan((R[3, 1] * R[3, 1] + R[3, 2] * R[3, 2])^(1/2), R[3, 3]),
         atan(R[2, 1]*ct1 - R[1, 1]*st1, R[2, 2]*ct1 - R[1, 2]*st1))
 end
 
-@inline function Tuple(r::RotZYZ{T}) where T
-    sinθ₁, cosθ₁ = _sincos(r.theta1)
-    sinθ₂, cosθ₂ = _sincos(r.theta2)
-    sinθ₃, cosθ₃ = _sincos(r.theta3)
+@inline function Base.Tuple(r::RotZYZ{T}) where T
+    sinθ₁, cosθ₁ = sincos(r.theta1)
+    sinθ₂, cosθ₂ = sincos(r.theta2)
+    sinθ₃, cosθ₃ = sincos(r.theta3)
 
     # transposed representation
     (cosθ₁*cosθ₂*cosθ₃ + -sinθ₁*sinθ₃,   sinθ₁*cosθ₂*cosθ₃ + cosθ₁*sinθ₃,   -sinθ₂*cosθ₃,
@@ -870,9 +837,9 @@ end
         throw("Dimension mismatch: cannot rotate a vector of length $(length(v))")
     end
 
-    sinθ₁, cosθ₁ = _sincos(r.theta1)
-    sinθ₂, cosθ₂ = _sincos(r.theta2)
-    sinθ₃, cosθ₃ = _sincos(r.theta3)
+    sinθ₁, cosθ₁ = sincos(r.theta1)
+    sinθ₂, cosθ₂ = sincos(r.theta2)
+    sinθ₃, cosθ₃ = sincos(r.theta3)
 
     T = Base.promote_op(*, typeof(sinθ₁), eltype(v))
 
@@ -908,17 +875,17 @@ RotXYZ
     R = SMatrix{3,3}(t)
 
     t1 = atan(-R[2, 3], R[3, 3])
-    st1, ct1 = _sincos(t1)
+    st1, ct1 = sincos(t1)
 
     Rot(t1,
         atan(R[1, 3], (R[1, 1] * R[1, 1] + R[1, 2] * R[1, 2])^(1/2)),
         atan(R[2, 1]*ct1 + R[3, 1]*st1, R[2, 2]*ct1 + R[3, 2]*st1))
 end
 
-@inline function Tuple(r::RotXYZ{T}) where T
-    sinθ₁, cosθ₁ = _sincos(r.theta1)
-    sinθ₂, cosθ₂ = _sincos(r.theta2)
-    sinθ₃, cosθ₃ = _sincos(r.theta3)
+@inline function Base.Tuple(r::RotXYZ{T}) where T
+    sinθ₁, cosθ₁ = sincos(r.theta1)
+    sinθ₂, cosθ₂ = sincos(r.theta2)
+    sinθ₃, cosθ₃ = sincos(r.theta3)
 
     # transposed representation
     (cosθ₂*cosθ₃,   sinθ₁*sinθ₂*cosθ₃ + cosθ₁*sinθ₃,   cosθ₁*-sinθ₂*cosθ₃ + sinθ₁*sinθ₃,
@@ -931,9 +898,9 @@ end
         throw("Dimension mismatch: cannot rotate a vector of length $(length(v))")
     end
 
-    sinθ₁, cosθ₁ = _sincos(r.theta1)
-    sinθ₂, cosθ₂ = _sincos(r.theta2)
-    sinθ₃, cosθ₃ = _sincos(r.theta3)
+    sinθ₁, cosθ₁ = sincos(r.theta1)
+    sinθ₂, cosθ₂ = sincos(r.theta2)
+    sinθ₃, cosθ₃ = sincos(r.theta3)
 
     T = Base.promote_op(*, typeof(sinθ₁), eltype(v))
 
@@ -966,17 +933,17 @@ RotZYX
     R = SMatrix{3,3}(t)
 
     t1 = atan(R[2, 1], R[1, 1])
-    st1, ct1 = _sincos(t1)
+    st1, ct1 = sincos(t1)
 
     Rot(t1,
         atan(-R[3, 1], (R[3, 2] * R[3, 2] + R[3, 3] * R[3, 3])^(1/2)),
         atan(R[1, 3]*st1 - R[2, 3]*ct1, R[2, 2]*ct1 - R[1, 2]*st1))
 end
 
-@inline function Tuple(r::RotZYX{T}) where T
-    sinθ₁, cosθ₁ = _sincos(r.theta1)
-    sinθ₂, cosθ₂ = _sincos(r.theta2)
-    sinθ₃, cosθ₃ = _sincos(r.theta3)
+@inline function Base.Tuple(r::RotZYX{T}) where T
+    sinθ₁, cosθ₁ = sincos(r.theta1)
+    sinθ₂, cosθ₂ = sincos(r.theta2)
+    sinθ₃, cosθ₃ = sincos(r.theta3)
 
     # transposed representation
     ( cosθ₁*cosθ₂,                       sinθ₁*cosθ₂,                      -sinθ₂,
@@ -989,9 +956,9 @@ end
         throw("Dimension mismatch: cannot rotate a vector of length $(length(v))")
     end
 
-    sinθ₁, cosθ₁ = _sincos(r.theta1)
-    sinθ₂, cosθ₂ = _sincos(r.theta2)
-    sinθ₃, cosθ₃ = _sincos(r.theta3)
+    sinθ₁, cosθ₁ = sincos(r.theta1)
+    sinθ₂, cosθ₂ = sincos(r.theta2)
+    sinθ₃, cosθ₃ = sincos(r.theta3)
 
     T = Base.promote_op(*, typeof(sinθ₁), eltype(v))
 
@@ -1024,17 +991,17 @@ RotXZY
     R = SMatrix{3,3}(t)
 
     t1 = atan(R[3, 2], R[2, 2])
-    st1, ct1 = _sincos(t1)
+    st1, ct1 = sincos(t1)
 
     Rot(t1,
         atan(-R[1, 2], (R[1, 1] * R[1, 1] + R[1, 3] * R[1, 3])^(1/2)),
         atan(R[2, 1]*st1 - R[3, 1]*ct1, R[3, 3]*ct1 - R[2, 3]*st1))
 end
 
-@inline function Tuple(r::RotXZY{T}) where T
-    sinθ₁, cosθ₁ = _sincos(r.theta1)
-    sinθ₂, cosθ₂ = _sincos(r.theta2)
-    sinθ₃, cosθ₃ = _sincos(r.theta3)
+@inline function Base.Tuple(r::RotXZY{T}) where T
+    sinθ₁, cosθ₁ = sincos(r.theta1)
+    sinθ₂, cosθ₂ = sincos(r.theta2)
+    sinθ₃, cosθ₃ = sincos(r.theta3)
 
     # transposed representation
     ( cosθ₂*cosθ₃,  cosθ₁*sinθ₂*cosθ₃ + sinθ₁*sinθ₃,   sinθ₁*sinθ₂*cosθ₃ + cosθ₁*-sinθ₃,
@@ -1047,9 +1014,9 @@ end
         throw("Dimension mismatch: cannot rotate a vector of length $(length(v))")
     end
 
-    sinθ₁, cosθ₁ = _sincos(r.theta1)
-    sinθ₂, cosθ₂ = _sincos(r.theta2)
-    sinθ₃, cosθ₃ = _sincos(r.theta3)
+    sinθ₁, cosθ₁ = sincos(r.theta1)
+    sinθ₂, cosθ₂ = sincos(r.theta2)
+    sinθ₃, cosθ₃ = sincos(r.theta3)
 
     T = Base.promote_op(*, typeof(sinθ₁), eltype(v))
 
@@ -1082,17 +1049,17 @@ RotYZX
     R = SMatrix{3,3}(t)
 
     t1 = atan(-R[3, 1], R[1, 1])
-    st1, ct1 = _sincos(t1)
+    st1, ct1 = sincos(t1)
 
     Rot(t1,
         atan(R[2, 1], (R[2, 2] * R[2, 2] + R[2, 3] * R[2, 3])^(1/2)),
         atan(R[3, 2]*ct1 + R[1, 2]*st1, R[3, 3]*ct1 + R[1, 3]*st1))
 end
 
-@inline function Tuple(r::RotYZX{T}) where T
-    sinθ₁, cosθ₁ = _sincos(r.theta1)
-    sinθ₂, cosθ₂ = _sincos(r.theta2)
-    sinθ₃, cosθ₃ = _sincos(r.theta3)
+@inline function Base.Tuple(r::RotYZX{T}) where T
+    sinθ₁, cosθ₁ = sincos(r.theta1)
+    sinθ₂, cosθ₂ = sincos(r.theta2)
+    sinθ₃, cosθ₃ = sincos(r.theta3)
 
     # transposed representation
     (cosθ₁*cosθ₂,                        sinθ₂,         -sinθ₁*cosθ₂,
@@ -1105,9 +1072,9 @@ end
         throw("Dimension mismatch: cannot rotate a vector of length $(length(v))")
     end
 
-    sinθ₁, cosθ₁ = _sincos(r.theta1)
-    sinθ₂, cosθ₂ = _sincos(r.theta2)
-    sinθ₃, cosθ₃ = _sincos(r.theta3)
+    sinθ₁, cosθ₁ = sincos(r.theta1)
+    sinθ₂, cosθ₂ = sincos(r.theta2)
+    sinθ₃, cosθ₃ = sincos(r.theta3)
 
     T = Base.promote_op(*, typeof(sinθ₁), eltype(v))
 
@@ -1140,17 +1107,17 @@ RotYXZ
     R = SMatrix{3,3}(t)
 
     t1 = atan(R[1, 3], R[3, 3])
-    st1, ct1 = _sincos(t1)
+    st1, ct1 = sincos(t1)
 
     Rot(t1,
         atan(-R[2, 3], (R[2, 1] * R[2, 1] + R[2, 2] * R[2, 2])^(1/2)),
         atan(R[3, 2]*st1 - R[1, 2]*ct1, R[1, 1]*ct1 - R[3, 1]*st1))
 end
 
-@inline function Tuple(r::RotYXZ{T}) where T
-    sinθ₁, cosθ₁ = _sincos(r.theta1)
-    sinθ₂, cosθ₂ = _sincos(r.theta2)
-    sinθ₃, cosθ₃ = _sincos(r.theta3)
+@inline function Base.Tuple(r::RotYXZ{T}) where T
+    sinθ₁, cosθ₁ = sincos(r.theta1)
+    sinθ₂, cosθ₂ = sincos(r.theta2)
+    sinθ₃, cosθ₃ = sincos(r.theta3)
 
     # transposed representation
     (cosθ₁*cosθ₃ + sinθ₁*sinθ₂*sinθ₃,   cosθ₂*sinθ₃,  -sinθ₁*cosθ₃ + cosθ₁*sinθ₂*sinθ₃,
@@ -1163,9 +1130,9 @@ end
         throw("Dimension mismatch: cannot rotate a vector of length $(length(v))")
     end
 
-    sinθ₁, cosθ₁ = _sincos(r.theta1)
-    sinθ₂, cosθ₂ = _sincos(r.theta2)
-    sinθ₃, cosθ₃ = _sincos(r.theta3)
+    sinθ₁, cosθ₁ = sincos(r.theta1)
+    sinθ₂, cosθ₂ = sincos(r.theta2)
+    sinθ₃, cosθ₃ = sincos(r.theta3)
 
     T = Base.promote_op(*, typeof(sinθ₁), eltype(v))
 
@@ -1198,17 +1165,17 @@ RotZXY
     R = SMatrix{3,3}(t)
 
     t1 = atan(-R[1, 2], R[2, 2])
-    st1, ct1 = _sincos(t1)
+    st1, ct1 = sincos(t1)
 
     Rot(t1,
         atan(R[3, 2], (R[3, 1] * R[3, 1] + R[3, 3] * R[3, 3])^(1/2)),
         atan(R[1, 3]*ct1 + R[2, 3]*st1, R[1, 1]*ct1 + R[2, 1]*st1))
 end
 
-@inline function Tuple(r::RotZXY{T}) where T
-    sinθ₁, cosθ₁ = _sincos(r.theta1)
-    sinθ₂, cosθ₂ = _sincos(r.theta2)
-    sinθ₃, cosθ₃ = _sincos(r.theta3)
+@inline function Base.Tuple(r::RotZXY{T}) where T
+    sinθ₁, cosθ₁ = sincos(r.theta1)
+    sinθ₂, cosθ₂ = sincos(r.theta2)
+    sinθ₃, cosθ₃ = sincos(r.theta3)
 
     # transposed representation
     ( cosθ₁*cosθ₃ + sinθ₁*sinθ₂*-sinθ₃,  sinθ₁*cosθ₃ + cosθ₁*-sinθ₂*-sinθ₃,  cosθ₂*-sinθ₃,
@@ -1221,9 +1188,9 @@ end
         throw("Dimension mismatch: cannot rotate a vector of length $(length(v))")
     end
 
-    sinθ₁, cosθ₁ = _sincos(r.theta1)
-    sinθ₂, cosθ₂ = _sincos(r.theta2)
-    sinθ₃, cosθ₃ = _sincos(r.theta3)
+    sinθ₁, cosθ₁ = sincos(r.theta1)
+    sinθ₂, cosθ₂ = sincos(r.theta2)
+    sinθ₃, cosθ₃ = sincos(r.theta3)
 
     T = Base.promote_op(*, typeof(sinθ₁), eltype(v))
 

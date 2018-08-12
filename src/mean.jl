@@ -29,7 +29,7 @@ Args:
 Find the mean `r̄` of a set of rotations `r`. The returned rotation minimizes `sum_i=1:n (||r[i] - r̄||)`  with `||` the Frobenius norm, or
 equivalently minimizes `sum_i=1:n (sin(ϕ[i] / 2))^2`, where `ϕ[i] = rotation_angle(r[i] / r̄)`.
 """
-function mean(qvec::AbstractVector{Quat{T}}, method::Integer = 0) where T
+function Statistics.mean(qvec::AbstractVector{Quat{T}}, method::Integer = 0) where T
     #if (method == 0)
         M = zeros(4, 4)
         for i = 1:length(qvec)
@@ -46,6 +46,6 @@ function mean(qvec::AbstractVector{Quat{T}}, method::Integer = 0) where T
     return Qbar
 end
 
-function mean(vec::AbstractVector{R}) where R<:Rotation
+function Statistics.mean(vec::AbstractVector{R}) where R<:Rotation
     R(mean(convert(Vector{Quat{eltype(R)}}, vec)))
 end

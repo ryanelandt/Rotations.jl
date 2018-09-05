@@ -257,18 +257,26 @@ end
 @inline Base.Tuple(spq::SPQuat) = Tuple(convert(Quat, spq))
 
 @inline function Base.convert(::Type{Q}, spq::SPQuat) where Q <: Quat
-    # Both the sign and norm of the Quat is automatically dealt with in its inner constructor
-    return Q(1 - (spq.x*spq.x + spq.y*spq.y + spq.z*spq.z), 2*spq.x, 2*spq.y, 2*spq.z)
+    # Equation (45) in
+    # Terzakis et al., "A Recipe on the Parameterization of Rotation Matrices
+    # for Non-Linear Optimization using Quaternions":
+    alpha2 = spq.x * spq.x + spq.y * spq.y + spq.z * spq.z
+    scale = 2 / (alpha2 + 1)
+    Q((1 - alpha2) / (alpha2 + 1), scale * spq.x, scale * spq.y, scale * spq.z, false)
 end
 
 @inline function Base.convert(::Type{SPQ}, q::Quat) where SPQ <: SPQuat
-    # term = (alpha2 + 1) / 2
-    # term = ((1 - q.w) / (1 + q.w) + 1) / 2
-    # term = ((1 - q.w + (1 + q.w)) / (1 + q.w) / 2
-    # term = (2 / (1 + q.w)) / 2
-    # term = 1 / (1 + q.w)
-    term = 1 / (copysign(1, q.w) + q.w)  # incase q.w is not >= 0
-    spq = SPQ(q.x * term,  q.y * term, q.z * term)
+    # Simplification of (46) and (47) in
+    # Terzakis et al., "A Recipe on the Parameterization of Rotation Matrices
+    # for Non-Linear Optimization using Quaternions":
+    # α² = (1 - q.w) / (1 + q.w)
+    # scale = (α² + 1) / 2
+    # scale = ((1 - q.w) / (1 + q.w) + 1) / 2
+    # scale = ((1 - q.w + (1 + q.w)) / (1 + q.w) / 2
+    # scale = (2 / (1 + q.w)) / 2
+    # scale = 1 / (1 + q.w)
+    scale = 1 / (1 + q.w)
+    SPQ(q.x * scale,  q.y * scale, q.z * scale)
 end
 
 @inline Base.:*(spq::SPQuat, x::StaticVector) = Quat(spq) * x

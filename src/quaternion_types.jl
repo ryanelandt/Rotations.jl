@@ -256,6 +256,10 @@ end
 @inline Base.getindex(spq::SPQuat, i::Int) = convert(Quat, spq)[i]
 @inline Base.Tuple(spq::SPQuat) = Tuple(convert(Quat, spq))
 
+# Optimizations for going between Quat and SPQuat
+@inline (::Type{SPQ})(q::Quat) where {SPQ <: SPQuat} = convert(SPQ, q)
+@inline (::Type{Q})(spq::SPQuat) where {Q <: Quat} = convert(Q, spq)
+
 @inline function Base.convert(::Type{Q}, spq::SPQuat) where Q <: Quat
     # Equation (45) in
     # Terzakis et al., "A Recipe on the Parameterization of Rotation Matrices

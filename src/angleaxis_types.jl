@@ -82,7 +82,7 @@ end
     s2 = q.x * q.x + q.y * q.y + q.z * q.z
     cos_t2 = sqrt(s2)
     theta = 2 * atan(cos_t2 / abs(q.w))
-    sc = ifelse(cos_t2 > 0, promote(copysign(1 / cos_t2, q.w), 2)...) # N.B. the 2 "should" match the derivitive as cos_t2 -> 0
+    sc = ifelse(cos_t2 > 0, promote(copysign(1 / cos_t2, q.w), 2)...) # N.B. the 2 "should" match the derivative as cos_t2 -> 0
     return AA(theta, sc * q.x, sc * q.y, sc * q.z)
 end
 
@@ -175,7 +175,7 @@ function Base.convert(::Type{RV}, q::Quat) where RV <: RodriguesVec
     s2 = q.x * q.x + q.y * q.y + q.z * q.z
     cos_t2 = sqrt(s2)
     theta = 2 * atan(cos_t2 / abs(q.w))
-    sc = ifelse(cos_t2 > 0, promote(copysign(theta / cos_t2, q.w), 2)...) # N.B. the 2 "should" match the derivitive as cos_t2 -> 0
+    sc = ifelse(cos_t2 > 0, promote(copysign(theta / cos_t2, q.w), 2)...) # N.B. the 2 "should" match the derivative as cos_t2 -> 0
     return RV(sc * q.x, sc * q.y, sc * q.z)
 end
 

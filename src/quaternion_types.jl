@@ -220,7 +220,7 @@ end
 
 An `SPQuat` is a 3D rotation matrix represented by the "stereographic projection" of a normalized quaternion (shortened to "SPQuat"), which is
 a 3-element parametrization of a unit quaternion Q formed by the intersection of a line from [-1,0,0,0] to Q, with a plane containing the origin and with normal direction [1,0,0,0]. This
-is a compact representation of rotations where the derivitives of the rotation matrix's elements w.r.t. the SPQuat parameters are rational functions (making them useful for optimization).
+is a compact representation of rotations where the derivatives of the rotation matrix's elements w.r.t. the SPQuat parameters are rational functions (making them useful for optimization).
 
 See:
 

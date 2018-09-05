@@ -142,6 +142,24 @@ all_types = (RotMatrix{3}, Quat, SPQuat, AngleAxis, RodriguesVec,
         end
     end
 
+    @testset "Quaternion double cover" begin
+        repeats = 100
+        for i = 1 : repeats
+            q = rand(Quat)
+
+            q2 = Quat(-q.w, -q.x, -q.y, -q.z) # normalize: need a tolerance
+            @test SVector(q2.w, q2.x, q2.y, q2.z) ≈ SVector(-q.w, -q.x, -q.y, -q.z) atol = 100 * eps()
+            @test q ≈ q2 atol = 100 * eps()
+
+            q3 = Quat(-q.w, -q.x, -q.y, -q.z, false) # don't normalize: everything is exact
+            @test (q3.w, q3.x, q3.y, q3.z) == (-q.w, -q.x, -q.y, -q.z)
+            @test q == q3
+
+            Δq = q \ q3
+            @test Δq ≈ one(Quat) atol = 100 * eps()
+        end
+    end
+
     # compose two random rotations
     @testset "Compose rotations" begin
         repeats = 100

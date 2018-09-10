@@ -15,6 +15,7 @@ include("angleaxis_types.jl")
 include("euler_types.jl")
 include("mean.jl")
 include("derivatives.jl")
+include("principal_value.jl")
 
 
 export
@@ -34,7 +35,10 @@ export
     rotation_axis,
 
     # quaternion from two vectors
-    rotation_between
+    rotation_between,
+
+    # principal value of a rotation
+    principal_value
 
     # derivatives (names clash with ForwarDiff?)
     #jacobian, hessian

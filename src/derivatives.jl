@@ -105,23 +105,20 @@ function jacobian(::Type{Quat},  X::SPQuat)
     alpha2 = X.x * X.x + X.y * X.y + X.z * X.z
     dA2dX = 2 * vspq
 
-    # the function we're differentiating forces q.w +ve
-    qs = sign((1-alpha2) / (alpha2 + 1))
-
     # f = (1-alpha2) / (alpha2 + 1);
     den2 = (alpha2 + 1) * (alpha2 + 1)
-    dQ1dX = qs * (-dA2dX * (alpha2 + 1) - dA2dX * (1-alpha2)) / den2
+    dQ1dX = (-dA2dX * (alpha2 + 1) - dA2dX * (1-alpha2)) / den2
 
     # do the on diagonal terms
     # f = 2*x / (alpha2 + 1) => g = 2*x, h = alpha2 + 1
     # df / dx = (dg * h - dh * g) / (h^2)
-    dQiDi = qs * 2 * ((alpha2 + 1) - dA2dX .* vspq) / den2
+    dQiDi = 2 * ((alpha2 + 1) - dA2dX .* vspq) / den2
 
     # do the off entries
     # f = 2x / (alpha2 + 1)
-    dQxDi = qs * -2 * vspq[1] * dA2dX / den2
-    dQyDi = qs * -2 * vspq[2] * dA2dX / den2
-    dQzDi = qs * -2 * vspq[3] * dA2dX / den2
+    dQxDi = -2 * vspq[1] * dA2dX / den2
+    dQyDi = -2 * vspq[2] * dA2dX / den2
+    dQzDi = -2 * vspq[3] * dA2dX / den2
 
     # assemble it all
     dQdX = @SMatrix [ dQ1dX[1]  dQ1dX[2]  dQ1dX[3] ;
@@ -137,18 +134,14 @@ end
 #
 # Jacobian converting from a Quaternion to an SpQuat
 #
-function jacobian(::Type{SPQuat},  q::Quat{T}) where T
-    den = (1 + q.w)
-    dalpha2dQs = (-den - (1 - q.w)) / (den * den)
-
-    dSpqdQs = 1/2 * SVector(q.x, q.y, q.z) * dalpha2dQs
-
-    alpha2 = (1 - q.w) / (1 + q.w)
-    dSpqdQv = 1/2 * (alpha2 + 1)
-
-    J0 = @SMatrix [ dSpqdQs[1]  dSpqdQv  zero(T)   zero(T) ;
-                    dSpqdQs[2]  zero(T)  dSpqdQv   zero(T) ;
-                    dSpqdQs[3]  zero(T)  zero(T)   dSpqdQv ]
+function jacobian(::Type{SPQuat}, q::Quat{T}) where T
+    den = 1 + q.w
+    scale = 1 / den
+    dscaledQw = -(scale * scale)
+    dSpqdQw = SVector(q.x, q.y, q.z) * dscaledQw
+    J0 = @SMatrix [ dSpqdQw[1]  scale   zero(T) zero(T) ;
+                    dSpqdQw[2]  zero(T) scale   zero(T) ;
+                    dSpqdQw[3]  zero(T) zero(T) scale ]
 
     # Need to project out norm component of Quat
     dQ = @SVector [q.w, q.x, q.y, q.z]

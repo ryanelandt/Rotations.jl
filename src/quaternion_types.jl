@@ -23,7 +23,7 @@ struct Quat{T} <: Rotation{3,T}
 
     @inline function Quat{T}(w, x, y, z, normalize::Bool = true) where {T}
         if normalize
-            norm = copysign(sqrt(w*w + x*x + y*y + z*z), w)
+            norm = sqrt(w*w + x*x + y*y + z*z)
             new(w/norm, x/norm, y/norm, z/norm)
         else
             new(w, x, y, z)
@@ -220,7 +220,7 @@ end
 
 An `SPQuat` is a 3D rotation matrix represented by the "stereographic projection" of a normalized quaternion (shortened to "SPQuat"), which is
 a 3-element parametrization of a unit quaternion Q formed by the intersection of a line from [-1,0,0,0] to Q, with a plane containing the origin and with normal direction [1,0,0,0]. This
-is a compact representation of rotations where the derivitives of the rotation matrix's elements w.r.t. the SPQuat parameters are rational functions (making them useful for optimization).
+is a compact representation of rotations where the derivatives of the rotation matrix's elements w.r.t. the SPQuat parameters are rational functions (making them useful for optimization).
 
 See:
 
@@ -256,14 +256,31 @@ end
 @inline Base.getindex(spq::SPQuat, i::Int) = convert(Quat, spq)[i]
 @inline Base.Tuple(spq::SPQuat) = Tuple(convert(Quat, spq))
 
+# Optimizations for going between Quat and SPQuat
+@inline (::Type{SPQ})(q::Quat) where {SPQ <: SPQuat} = convert(SPQ, q)
+@inline (::Type{Q})(spq::SPQuat) where {Q <: Quat} = convert(Q, spq)
+
 @inline function Base.convert(::Type{Q}, spq::SPQuat) where Q <: Quat
-    # Both the sign and norm of the Quat is automatically dealt with in its inner constructor
-    return Q(1 - (spq.x*spq.x + spq.y*spq.y + spq.z*spq.z), 2*spq.x, 2*spq.y, 2*spq.z)
+    # Equation (45) in
+    # Terzakis et al., "A Recipe on the Parameterization of Rotation Matrices
+    # for Non-Linear Optimization using Quaternions":
+    alpha2 = spq.x * spq.x + spq.y * spq.y + spq.z * spq.z
+    scale = 2 / (alpha2 + 1)
+    Q((1 - alpha2) / (alpha2 + 1), scale * spq.x, scale * spq.y, scale * spq.z, false)
 end
 
 @inline function Base.convert(::Type{SPQ}, q::Quat) where SPQ <: SPQuat
-    alpha2 = (1 - q.w) / (1 + q.w) # <= 1 since q.w >= 0
-    spq = SPQ(q.x * (alpha2 + 1)*0.5,  q.y * (alpha2 + 1)*0.5, q.z * (alpha2 + 1)*0.5)
+    # Simplification of (46) and (47) in
+    # Terzakis et al., "A Recipe on the Parameterization of Rotation Matrices
+    # for Non-Linear Optimization using Quaternions":
+    # α² = (1 - q.w) / (1 + q.w)
+    # scale = (α² + 1) / 2
+    # scale = ((1 - q.w) / (1 + q.w) + 1) / 2
+    # scale = ((1 - q.w + (1 + q.w)) / (1 + q.w) / 2
+    # scale = (2 / (1 + q.w)) / 2
+    # scale = 1 / (1 + q.w)
+    scale = 1 / (1 + q.w)
+    SPQ(q.x * scale,  q.y * scale, q.z * scale)
 end
 
 @inline Base.:*(spq::SPQuat, x::StaticVector) = Quat(spq) * x

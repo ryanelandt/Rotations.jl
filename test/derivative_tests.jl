@@ -28,8 +28,7 @@ using ForwardDiff
         # SPQuat to Quat
         @testset "Jacobian (SPQuat -> Quat)" begin
             for i = 1:10    # do some repeats
-                spq = rand(SPQuat)  # a random SPQUat
-                # TODO: should test the full domain of SPQuats, not just the one with ||.|| < 1
+                spq = rand(SPQuat)  # a random SPQuat
 
                 # test jacobian to a Rotation matrix
                 R_jac = Rotations.jacobian(Quat, spq)

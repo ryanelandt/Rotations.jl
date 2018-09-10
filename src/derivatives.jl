@@ -133,18 +133,14 @@ end
 #
 # Jacobian converting from a Quaternion to an SpQuat
 #
-function jacobian(::Type{SPQuat},  q::Quat{T}) where T
-    den = (1 + q.w)
-    dalpha2dQs = (-den - (1 - q.w)) / (den * den)
-
-    dSpqdQs = 1/2 * SVector(q.x, q.y, q.z) * dalpha2dQs
-
-    alpha2 = (1 - q.w) / (1 + q.w)
-    dSpqdQv = 1/2 * (alpha2 + 1)
-
-    J0 = @SMatrix [ dSpqdQs[1]  dSpqdQv  zero(T)   zero(T) ;
-                    dSpqdQs[2]  zero(T)  dSpqdQv   zero(T) ;
-                    dSpqdQs[3]  zero(T)  zero(T)   dSpqdQv ]
+function jacobian(::Type{SPQuat}, q::Quat{T}) where T
+    den = 1 + q.w
+    scale = 1 / den
+    dscaledQw = -(scale * scale)
+    dSpqdQw = SVector(q.x, q.y, q.z) * dscaledQw
+    J0 = @SMatrix [ dSpqdQw[1]  scale   zero(T) zero(T) ;
+                    dSpqdQw[2]  zero(T) scale   zero(T) ;
+                    dSpqdQw[3]  zero(T) zero(T) scale ]
 
     # Need to project out norm component of Quat
     dQ = @SVector [q.w, q.x, q.y, q.z]

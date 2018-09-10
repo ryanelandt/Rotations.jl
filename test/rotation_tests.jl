@@ -124,21 +124,20 @@ all_types = (RotMatrix{3}, Quat, SPQuat, AngleAxis, RodriguesVec,
     @testset "Rotate Points" begin
         repeats = 100
         @testset "$(R)" for R in all_types
+            I = one(R)::R
+
             Random.seed!(0)
             for i = 1:repeats
                 r = rand(R)
                 m = SMatrix(r)
-                v = randn(SVector{3})
+                v1 = randn(SVector{3})
+                v2 = randn(3)
 
-                @test r*v ≈ m*v
+                @test I*v1 ≈ v1
+                @test I*v2 ≈ v2
+                @test r*v1 ≈ m*v1
+                @test r*v2 ≈ m*v2
             end
-
-            # Test Base.Vector also
-            r = rand(R)
-            m = SMatrix(r)
-            v = randn(3)
-
-            @test r*v ≈ m*v
         end
     end
 

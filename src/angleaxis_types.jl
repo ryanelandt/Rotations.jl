@@ -186,9 +186,9 @@ function Base.:*(rv::RodriguesVec{T1}, v::StaticVector{3, T2}) where {T1,T2}
         return AngleAxis(rv) * v
     else
         return similar_type(typeof(v), promote_type(T1,T2))(
-                    v[1] + rv[2] * v[3] - rv[3] * v[2],
-                    v[2] + rv[3] * v[1] - rv[1] * v[3],
-                    v[3] + rv[1] * v[2] - rv[2] * v[1])
+                    v[1] + rv.sy * v[3] - rv.sz * v[2],
+                    v[2] + rv.sz * v[1] - rv.sx * v[3],
+                    v[3] + rv.sx * v[2] - rv.sy * v[1])
     end
 end
 

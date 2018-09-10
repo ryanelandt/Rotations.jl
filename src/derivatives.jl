@@ -126,7 +126,6 @@ function jacobian(::Type{Quat},  X::SPQuat)
                       dQyDi[1]  dQiDi[2]  dQyDi[3] ;
                       dQzDi[1]  dQzDi[2]  dQiDi[3] ]
 
-
     return dQdX
 end
 

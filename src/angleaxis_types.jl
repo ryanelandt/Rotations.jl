@@ -180,19 +180,15 @@ function Base.convert(::Type{RV}, q::Quat) where RV <: RodriguesVec
 end
 
 
-function Base.:*(rv::RodriguesVec{T1}, v::StaticVector{T2}) where {T1,T2}
-    if length(v) != 3
-        throw("Dimension mismatch: cannot rotate a vector of length $(length(v))")
-    end
-
+function Base.:*(rv::RodriguesVec{T1}, v::StaticVector{3, T2}) where {T1,T2}
     theta = rotation_angle(rv)
     if (theta > eps(T1)) # use eps here because we have the 1st order series expansion defined
         return AngleAxis(rv) * v
     else
         return similar_type(typeof(v), promote_type(T1,T2))(
-                    v[1] + rv[2] * v[3] - rv[3] * v[2],
-                    v[2] + rv[3] * v[1] - rv[1] * v[3],
-                    v[3] + rv[1] * v[2] - rv[2] * v[1])
+                    v[1] + rv.sy * v[3] - rv.sz * v[2],
+                    v[2] + rv.sz * v[1] - rv.sx * v[3],
+                    v[3] + rv.sx * v[2] - rv.sy * v[1])
     end
 end
 

@@ -309,8 +309,13 @@ all_types = (RotMatrix{3}, Quat, SPQuat, AngleAxis, RodriguesVec,
           @test isrotation(rand(rot_type))
 
         end 
+
       end
 
+      a=[40.0 0.0 0.0
+         0.0 0.0 1.0
+         0.0 1.0 0.0]
+      @test !isrotation(a) 
     end 
     
     @testset "Testing type aliases" begin

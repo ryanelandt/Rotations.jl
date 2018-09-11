@@ -296,6 +296,28 @@ all_types = (RotMatrix{3}, Quat, SPQuat, AngleAxis, RodriguesVec,
         end
     end
 
+    #########################################################################
+    # Check that isrotation works
+    #########################################################################
+    @testset "Testing isrotation" begin
+      a=[1.0 0.0 0.0
+         0.0 0.0 -1.0
+         0.0 1.0 0.0]
+      @test isrotation(a) 
+      foreach(rot_types) do rot_type
+        foreach(1:20) do idx
+          @test isrotation(rand(rot_type))
+
+        end 
+
+      end
+
+      a=[40.0 0.0 0.0
+         0.0 0.0 1.0
+         0.0 1.0 0.0]
+      @test !isrotation(a) 
+    end 
+    
     @testset "Testing type aliases" begin
         @test one(RotMatrix{2, Float64}) isa RotMatrix2{Float64}
         @test one(RotMatrix{3, Float64}) isa RotMatrix3{Float64}

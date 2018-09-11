@@ -82,9 +82,9 @@ end
     s2 = q.x * q.x + q.y * q.y + q.z * q.z
     sin_t2 = sqrt(s2)
     theta = 2 * atan(sin_t2, q.w)
-    eps_theta = eps(typeof(theta))
-    inv_sin_t2 = 1 / (sin_t2 + eps_theta)
-    return principal_value(AA(theta, inv_sin_t2 * (q.x + eps_theta), inv_sin_t2 * q.y, inv_sin_t2 * q.z))
+    num_pert = eps(typeof(theta))^2
+    inv_sin_t2 = 1 / (sin_t2 + num_pert)
+    return principal_value(AA(theta, inv_sin_t2 * (q.x + num_pert), inv_sin_t2 * q.y, inv_sin_t2 * q.z))
 end
 
 # Using Rodrigues formula on an AngleAxis parameterization (assume unit axis length) to do the rotation

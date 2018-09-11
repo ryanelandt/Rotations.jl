@@ -234,6 +234,7 @@ all_types = (RotMatrix{3}, Quat, SPQuat, AngleAxis, RodriguesVec,
                 @test rotation_axis(r2) ≈ axis
             end
         end
+	@test norm(rotation_axis(Quat(1.0, 0.0, 0.0, 0.0))) ≈ 1.0
 
         # TODO RotX, RotXY?
     end

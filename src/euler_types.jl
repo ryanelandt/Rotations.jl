@@ -21,9 +21,6 @@ for axis in [:X, :Y, :Z]
         @inline $RotType(theta::T) where {T} = $RotType{T}(theta)
         @inline $RotType(r::$RotType{T}) where {T} = $RotType{T}(r)
 
-        @inline Base.convert(::Type{R}, r::$RotType) where {R<:$RotType} = R(r)
-        @inline Base.convert(::Type{R}, r::R) where {R<:$RotType} = r
-
         @inline (::Type{R})(t::NTuple{9}) where {R<:$RotType} = error("Cannot construct a cardinal axis rotation from a matrix")
 
         @inline Base.:*(r1::$RotType, r2::$RotType) = $RotType(r1.theta + r2.theta)
@@ -227,9 +224,6 @@ for axis1 in [:X, :Y, :Z]
 
             @inline $RotType(theta1::T1, theta2::T2) where {T1, T2} = $RotType{promote_type(T1, T2)}(theta1, theta2)
             @inline $RotType(r::$RotType{T}) where {T} = $RotType{T}(r)
-
-            @inline Base.convert(::Type{R}, r::$RotType) where {R<:$RotType} = R(r)
-            @inline Base.convert(::Type{R}, r::R) where {R<:$RotType} = r
 
             @inline function Base.getindex(r::$RotType{T}, i::Int) where T
                 Tuple(r)[i] # Slow...
@@ -510,9 +504,6 @@ for axis1 in [:X, :Y, :Z]
 
                 @inline $RotType(theta1::T1, theta2::T2, theta3::T3) where {T1, T2, T3} = $RotType{promote_type(promote_type(T1, T2), T3)}(theta1, theta2, theta3)
                 @inline $RotType(r::$RotType{T}) where {T} = $RotType{T}(r)
-
-                @inline Base.convert(::Type{R}, r::$RotType) where {R<:$RotType} = R(r)
-                @inline Base.convert(::Type{R}, r::R) where {R<:$RotType} = r
 
                 @inline function Base.getindex(r::$RotType{T}, i::Int) where T
                     Tuple(r)[i] # Slow...

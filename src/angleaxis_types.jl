@@ -44,14 +44,11 @@ end
 end
 
 # These functions are enough to satisfy the entire StaticArrays interface:
-@inline (::Type{AA})(t::NTuple{9}) where {AA <: AngleAxis} = convert(AA, Quat(t))
-@inline Base.getindex(aa::AngleAxis, i::Int) = convert(Quat, aa)[i]
-@inline Tuple(aa::AngleAxis) = Tuple(convert(RotMatrix, aa))
+@inline (::Type{AA})(t::NTuple{9}) where {AA <: AngleAxis} = AA(Quat(t)) # TODO: consider going directly from tuple (RotMatrix) to AngleAxis
+@inline Base.getindex(aa::AngleAxis, i::Int) = Quat(aa)[i]
 
-@inline function Base.convert(::Type{R}, aa::AngleAxis) where R <: RotMatrix
+@inline function Base.Tuple(aa::AngleAxis{T}) where T
     # Rodrigues' rotation formula.
-    T = eltype(aa)
-
     s, c = sincos(aa.theta)
     c1 = one(T) - c
 
@@ -68,17 +65,17 @@ end
     sz = s * aa.axis_z
 
     # Note that the RotMatrix constructor argument order makes this look transposed:
-    R(one(T) - c1y2 - c1z2, c1xy + sz, c1xz - sy,
-      c1xy - sz, one(T) - c1x2 - c1z2, c1yz + sx,
-      c1xz + sy, c1yz - sx, one(T) - c1x2 - c1y2)
+    (one(T) - c1y2 - c1z2, c1xy + sz, c1xz - sy,
+        c1xy - sz, one(T) - c1x2 - c1z2, c1yz + sx,
+        c1xz + sy, c1yz - sx, one(T) - c1x2 - c1y2)
 end
 
-@inline function Base.convert(::Type{Q}, aa::AngleAxis) where Q <: Quat
+@inline function (::Type{Q})(aa::AngleAxis) where Q <: Quat
     s, c = sincos(aa.theta / 2)
     return Q(c, s * aa.axis_x, s * aa.axis_y, s * aa.axis_z, false)
 end
 
-@inline function Base.convert(::Type{AA}, q::Quat) where AA <: AngleAxis
+@inline function (::Type{AA})(q::Quat) where AA <: AngleAxis
     s2 = q.x * q.x + q.y * q.y + q.z * q.z
     sin_t2 = sqrt(s2)
     theta = 2 * atan(sin_t2, q.w)
@@ -147,24 +144,21 @@ end
 @inline RodriguesVec(x::X, y::Y, z::Z) where {X,Y,Z} = RodriguesVec{promote_type(promote_type(X, Y), Z)}(x, y, z)
 
 # These functions are enough to satisfy the entire StaticArrays interface:
-@inline (::Type{RV})(t::NTuple{9}) where {RV <: RodriguesVec} = convert(RV, Quat(t))
-@inline Base.getindex(aa::RodriguesVec, i::Int) = convert(Quat, aa)[i]
-@inline Base.Tuple(rv::RodriguesVec) = Tuple(convert(Quat, rv))
+@inline (::Type{RV})(t::NTuple{9}) where {RV <: RodriguesVec} = RV(Quat(t)) # TODO: go through AngleAxis once it's faster
+@inline Base.getindex(aa::RodriguesVec, i::Int) = Quat(aa)[i]
+@inline Base.Tuple(rv::RodriguesVec) = Tuple(Quat(rv))
 
-# define its interaction with other angle representations
-@inline Base.convert(::Type{R}, rv::RodriguesVec) where {R <: RotMatrix} = convert(R, AngleAxis(rv))
-
-function Base.convert(::Type{AA}, rv::RodriguesVec) where AA <: AngleAxis
+function (::Type{AA})(rv::RodriguesVec) where AA <: AngleAxis
     # TODO: consider how to deal with derivative near theta = 0. There should be a first-order expansion here.
     theta = rotation_angle(rv)
     return theta > 0 ? AA(theta, rv.sx / theta, rv.sy / theta, rv.sz / theta, false) : AA(zero(theta), one(theta), zero(theta), zero(theta), false)
 end
 
-function Base.convert(::Type{RV}, aa::AngleAxis) where RV <: RodriguesVec
+function (::Type{RV})(aa::AngleAxis) where RV <: RodriguesVec
     return RV(aa.theta * aa.axis_x, aa.theta * aa.axis_y, aa.theta * aa.axis_z)
 end
 
-function Base.convert(::Type{Q}, rv::RodriguesVec) where Q <: Quat
+function (::Type{Q})(rv::RodriguesVec) where Q <: Quat
     theta = rotation_angle(rv)
     qtheta = cos(theta / 2)
     #s = abs(1/2 * sinc((theta / 2) / pi))
@@ -172,7 +166,7 @@ function Base.convert(::Type{Q}, rv::RodriguesVec) where Q <: Quat
     return Q(qtheta, s * rv.sx, s * rv.sy, s * rv.sz, false)
 end
 
-Base.convert(::Type{RV}, q::Quat) where {RV <: RodriguesVec} = convert(RV, convert(AngleAxis, q))
+(::Type{RV})(q::Quat) where {RV <: RodriguesVec} = RV(AngleAxis(q))
 
 function Base.:*(rv::RodriguesVec{T1}, v::StaticVector{3, T2}) where {T1,T2}
     theta = rotation_angle(rv)
@@ -199,9 +193,6 @@ end
 @inline Base.inv(rv::RodriguesVec) = RodriguesVec(-rv.sx, -rv.sy, -rv.sz)
 @inline Base.:^(rv::RodriguesVec, t::Real) = RodriguesVec(rv.sx*t, rv.sy*t, rv.sz*t)
 @inline Base.:^(rv::RodriguesVec, t::Integer) = RodriguesVec(rv.sx*t, rv.sy*t, rv.sz*t) # to avoid ambiguity
-
-
-
 
 # rotation properties
 @inline rotation_angle(rv::RodriguesVec) = sqrt(rv.sx * rv.sx + rv.sy * rv.sy + rv.sz * rv.sz)

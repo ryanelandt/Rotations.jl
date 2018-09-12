@@ -32,7 +32,7 @@ using ForwardDiff
 
                 # test jacobian to a Rotation matrix
                 R_jac = Rotations.jacobian(Quat, spq)
-                FD_jac = ForwardDiff.jacobian(x -> (q = convert(Quat, SPQuat(x[1],x[2],x[3]));
+                FD_jac = ForwardDiff.jacobian(x -> (q = Quat(SPQuat(x[1],x[2],x[3]));
                                                     SVector(q.w, q.x, q.y, q.z)),
                                               SVector(spq.x, spq.y, spq.z))
 
@@ -45,7 +45,7 @@ using ForwardDiff
             for spq = [SPQuat(1.0, 0.0, 0.0), SPQuat(0.0, 1.0, 0.0), SPQuat(0.0, 0.0, 1.0)]
                 # test jacobian to a Rotation matrix
                 R_jac = Rotations.jacobian(Quat, spq)
-                FD_jac = ForwardDiff.jacobian(x -> (q = convert(Quat, SPQuat(x[1],x[2],x[3]));
+                FD_jac = ForwardDiff.jacobian(x -> (q = Quat(SPQuat(x[1],x[2],x[3]));
                                                     SVector(q.w, q.x, q.y, q.z)),
                                               SVector(spq.x, spq.y, spq.z))
 
@@ -61,7 +61,7 @@ using ForwardDiff
 
                 # test jacobian to a Rotation matrix
                 R_jac = Rotations.jacobian(SPQuat, q)
-                FD_jac = ForwardDiff.jacobian(x -> (spq = convert(SPQuat, Quat(x[1], x[2], x[3], x[4]));
+                FD_jac = ForwardDiff.jacobian(x -> (spq = SPQuat(Quat(x[1], x[2], x[3], x[4]));
                                                     SVector(spq.x, spq.y, spq.z)),
                                               SVector(q.w, q.x, q.y, q.z))
 

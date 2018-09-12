@@ -16,6 +16,9 @@ Base.transpose(r::Rotation{N,T}) where {N,T<:Real} = inv(r)
 rotation_angle(r::Rotation) = rotation_angle(AngleAxis(r))
 rotation_axis(r::Rotation) = rotation_axis(AngleAxis(r))
 
+# `convert` goes through the constructors, similar to e.g. `Number`
+Base.convert(::Type{R}, rot::Rotation{N}) where {N,R<:Rotation{N}} = R(rot)
+
 # Rotation matrices should be orthoginal/unitary. Only the operations we define,
 # like multiplication, will stay as Rotations, otherwise users will get an
 # SMatrix{3,3} (e.g. rot1 + rot2 -> SMatrix)
@@ -82,7 +85,6 @@ end
 RotMatrix(x::SMatrix{N,N,T,L}) where {N,T,L} = RotMatrix{N,T,L}(x)
 
 # These functions (plus size) are enough to satisfy the entire StaticArrays interface:
-# @inline (::Type{R}){R<:RotMatrix}(t::Tuple)  = error("No precise constructor found. Length of input was $(length(t)).")
 for N = 2:3
     L = N*N
     RotMatrixN = Symbol(:RotMatrix, N)

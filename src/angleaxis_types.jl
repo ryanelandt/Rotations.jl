@@ -80,10 +80,11 @@ end
 
 @inline function Base.convert(::Type{AA}, q::Quat) where AA <: AngleAxis
     s2 = q.x * q.x + q.y * q.y + q.z * q.z
-    cos_t2 = sqrt(s2)
-    theta = 2 * atan(cos_t2 / abs(q.w))
-    sc = ifelse(cos_t2 > 0, promote(copysign(1 / cos_t2, q.w), 2)...) # N.B. the 2 "should" match the derivative as cos_t2 -> 0
-    return AA(theta, sc * q.x, sc * q.y, sc * q.z)
+    sin_t2 = sqrt(s2)
+    theta = 2 * atan(sin_t2, q.w)
+    num_pert = eps(typeof(theta))^2
+    inv_sin_t2 = 1 / (sin_t2 + num_pert)
+    return principal_value(AA(theta, inv_sin_t2 * (q.x + num_pert), inv_sin_t2 * q.y, inv_sin_t2 * q.z))
 end
 
 # Using Rodrigues formula on an AngleAxis parameterization (assume unit axis length) to do the rotation

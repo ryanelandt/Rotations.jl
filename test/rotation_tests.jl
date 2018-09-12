@@ -308,12 +308,13 @@ all_types = (RotMatrix{3}, Quat, SPQuat, AngleAxis, RodriguesVec,
       foreach(rot_types) do rot_type
         foreach(1:20) do idx
           @test isrotation(rand(rot_type))
-
         end 
-
       end
-
       a=[40.0 0.0 0.0
+         0.0 0.0 1.0
+         0.0 1.0 0.0]
+      @test !isrotation(a) 
+      a=[1.0 0.0 0.0
          0.0 0.0 1.0
          0.0 1.0 0.0]
       @test !isrotation(a) 

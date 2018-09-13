@@ -36,10 +36,6 @@ end
 @inline function Quat(w::W, x::X, y::Y, z::Z, normalize::Bool = true) where {W, X, Y, Z}
     Quat{promote_type(promote_type(promote_type(W, X), Y), Z)}(w, x, y, z, normalize)
 end
-@inline Quat(q::Quat{T}) where {T} = Quat{T}(q)
-
-@inline Base.convert(::Type{Q}, q::Quat) where {Q<:Quat} = Q(q)
-@inline Base.convert(::Type{Q}, q::Q) where {Q<:Quat} = q
 
 # These 3 functions are enough to satisfy the entire StaticArrays interface:
 function (::Type{Q})(t::NTuple{9}) where Q<:Quat
@@ -246,21 +242,13 @@ struct SPQuat{T} <: Rotation{3,T}
 end
 
 @inline SPQuat(x::X, y::Y, z::Z) where {X,Y,Z} = SPQuat{promote_type(promote_type(X, Y), Z)}(x, y, z)
-@inline SPQuat(spq::SPQuat{T}) where {T} = SPQuat{T}(spq)
-
-@inline Base.convert(::Type{SPQ}, spq::SPQuat) where {SPQ<:SPQuat} = SPQ(spq)
-@inline Base.convert(::Type{SPQ}, spq::SPQ) where {SPQ<:SPQuat} = spq
 
 # These functions are enough to satisfy the entire StaticArrays interface:
 @inline (::Type{SPQ})(t::NTuple{9}) where {SPQ <: SPQuat} = convert(SPQ, Quat(t))
 @inline Base.getindex(spq::SPQuat, i::Int) = convert(Quat, spq)[i]
 @inline Base.Tuple(spq::SPQuat) = Tuple(convert(Quat, spq))
 
-# Optimizations for going between Quat and SPQuat
-@inline (::Type{SPQ})(q::Quat) where {SPQ <: SPQuat} = convert(SPQ, q)
-@inline (::Type{Q})(spq::SPQuat) where {Q <: Quat} = convert(Q, spq)
-
-@inline function Base.convert(::Type{Q}, spq::SPQuat) where Q <: Quat
+@inline function (::Type{Q})(spq::SPQuat) where Q <: Quat
     # Equation (45) in
     # Terzakis et al., "A Recipe on the Parameterization of Rotation Matrices
     # for Non-Linear Optimization using Quaternions":
@@ -269,7 +257,7 @@ end
     Q((1 - alpha2) / (alpha2 + 1), scale * spq.x, scale * spq.y, scale * spq.z, false)
 end
 
-@inline function Base.convert(::Type{SPQ}, q::Quat) where SPQ <: SPQuat
+@inline function (::Type{SPQ})(q::Quat) where SPQ <: SPQuat
     # Simplification of (46) and (47) in
     # Terzakis et al., "A Recipe on the Parameterization of Rotation Matrices
     # for Non-Linear Optimization using Quaternions":
@@ -295,7 +283,3 @@ end
 
 @inline Base.one(::Type{SPQuat}) = SPQuat(0.0, 0.0, 0.0)
 @inline Base.one(::Type{SPQuat{T}}) where {T} = SPQuat{T}(zero(T), zero(T), zero(T))
-
-# rotation properties
-@inline rotation_angle(spq::SPQuat) = rotation_angle(Quat(spq))
-@inline rotation_axis(spq::SPQuat) = rotation_axis(Quat(spq))

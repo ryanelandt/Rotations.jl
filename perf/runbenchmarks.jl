@@ -14,7 +14,7 @@ for (from, to) in product(rotationtypes, rotationtypes)
     if from != to
         name = "$(string(from)) -> $(string(to))"
         # use eval here because of https://github.com/JuliaCI/BenchmarkTools.jl/issues/50#issuecomment-318673288
-        noneuler[name] = eval(:(@benchmarkable convert($to, rot) setup = rot = rand($from)))
+        noneuler[name] = eval(:(@benchmarkable $to(rot) setup = rot = rand($from)))
     end
 end
 
@@ -28,7 +28,7 @@ for from in eulertypes
     to = RotMatrix3{T}
     name = "$(string(from)) -> $(string(to))"
     # use eval here because of https://github.com/JuliaCI/BenchmarkTools.jl/issues/50#issuecomment-318673288
-    euler[name] = eval(:(@benchmarkable convert($to, rot) setup = rot = rand($from)))
+    euler[name] = eval(:(@benchmarkable $to(rot) setup = rot = rand($from)))
 end
 
 

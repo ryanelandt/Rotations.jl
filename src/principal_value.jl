@@ -20,7 +20,7 @@ the following properties:
 """
 principal_value(r::RotMatrix) = r
 principal_value(q::Quat{T}) where {T} = q.w < zero(T) ? Quat{T}(-q.w, -q.x, -q.y, -q.z) : q
-principal_value(spq::SPQuat{T}) where {T} = convert(SPQuat, principal_value(convert(Quat, spq)))
+principal_value(spq::SPQuat{T}) where {T} = SPQuat(principal_value(Quat(spq)))
 
 function principal_value(aa::AngleAxis{T}) where {T}
     theta = mod_minus_pi_to_pi(aa.theta)

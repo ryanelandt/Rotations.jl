@@ -149,7 +149,7 @@ function isrotation(r::AbstractMatrix{T}, tol::Real = 1000 * eps(eltype(T))) whe
         return false
     end
 
-    return d < tol
+    return d < tol && det(r) > 0
 end
 
 # A simplification and specialization of the Base.show function for AbstractArray makes

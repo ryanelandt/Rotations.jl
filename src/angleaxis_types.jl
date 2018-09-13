@@ -82,7 +82,7 @@ end
     s2 = q.x * q.x + q.y * q.y + q.z * q.z
     sin_t2 = sqrt(s2)
     theta = 2 * atan(sin_t2, q.w)
-    num_pert = eps(typeof(theta))^2
+    num_pert = eps(typeof(theta))^4
     inv_sin_t2 = 1 / (sin_t2 + num_pert)
     return principal_value(AA(theta, inv_sin_t2 * (q.x + num_pert), inv_sin_t2 * q.y, inv_sin_t2 * q.z, false))
 end

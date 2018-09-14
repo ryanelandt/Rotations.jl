@@ -1,5 +1,3 @@
-mod_minus_pi_to_pi(a::T) where {T} = mod2pi(a + pi) - pi
-
 """
     principal_value(R::Rotation{3})
 
@@ -19,11 +17,33 @@ the following properties:
 
 """
 principal_value(r::RotMatrix) = r
-principal_value(q::Quat{T}) where {T} = q.w < zero(T) ? Quat{T}(-q.w, -q.x, -q.y, -q.z) : q
-principal_value(spq::SPQuat{T}) where {T} = SPQuat(principal_value(Quat(spq)))
+principal_value(q::Quat{T}) where {T} = q.w < zero(T) ? Quat{T}(-q.w, -q.x, -q.y, -q.z, false) : q
+function principal_value(spq::SPQuat{T}) where {T}
+    # A quat with positive real part: Quat( qw,  qx,  qy,  qz)
+    #
+    # A spq corresponding to the Quat with a positive real part:
+    # SPQuat( qx / (1 + qw),  qy / (1 + qw),  qz / (1 + qw)) ≡ SPQuat(spx, spy, spz)
+    #
+    # A spq corresponding to the Quat with a negative real part:
+    # SPQuat(-qx / (1 - qw), -qy / (1 - qw), -qz / (1 - qw)) ≡ SPQuat(snx, sny, snz)
+    #
+    # Claim:         spx / snx = -1 / (spx^2 + spy^2 + spz^2)
+    #     -(1 + qw) / (1 - qw) = -1 / (spx^2 + spy^2 + spz^2)
+    #      (1 - qw) / (1 + qw) = (spx^2 + spy^2 + spz^2)
+    #      (1 - qw) / (1 + qw) = (qx^2 + qy^2 + qz^2) / (1 + qw)^2
+    #      (1 - qw) * (1 + qw) =  qx^2 + qy^2 + qz^2
+    #                 1 - qw^2 =  qx^2 + qy^2 + qz^2 (Q.E.D.)
+    alpha_2 = spq.x^2 + spq.y^2 + spq.z^2
+    if one(T) < alpha_2
+        scale = -one(T) / alpha_2
+        return SPQuat(scale * spq.x, scale * spq.y, scale * spq.z)
+    else
+        return spq
+    end
+end
 
 function principal_value(aa::AngleAxis{T}) where {T}
-    theta = mod_minus_pi_to_pi(aa.theta)
+    theta = rem2pi(aa.theta, RoundNearest)
     if theta < zero(T)
         return AngleAxis(-theta, -aa.axis_x, -aa.axis_y, -aa.axis_z, false)
     else
@@ -34,7 +54,7 @@ end
 function principal_value(rv::RodriguesVec{T}) where {T}
     theta = rotation_angle(rv)
     if pi < theta
-        re_s = mod_minus_pi_to_pi(theta) / theta
+        re_s = rem2pi(theta, RoundNearest) / theta
         return RodriguesVec(re_s * rv.sx, re_s * rv.sy, re_s * rv.sz)
     else
         return rv
@@ -44,7 +64,7 @@ end
 for rot_type in [:RotX, :RotY, :RotZ]
     @eval begin
         function principal_value(r::$rot_type{T}) where {T}
-            return $(rot_type){T}(mod_minus_pi_to_pi(r.theta))
+            return $(rot_type){T}(rem2pi(r.theta, RoundNearest))
         end
     end
 end
@@ -52,8 +72,8 @@ end
 for rot_type in [:RotXY, :RotYX, :RotZX, :RotXZ, :RotYZ, :RotZY]
     @eval begin
         function principal_value(r::$rot_type{T}) where {T}
-            theta1 = mod_minus_pi_to_pi(r.theta1)
-            theta2 = mod_minus_pi_to_pi(r.theta2)
+            theta1 = rem2pi(r.theta1, RoundNearest)
+            theta2 = rem2pi(r.theta2, RoundNearest)
             return $(rot_type){T}(theta1, theta2)
         end
     end
@@ -62,10 +82,11 @@ end
 for rot_type in [:RotXYX, :RotYXY, :RotZXZ, :RotXZX, :RotYZY, :RotZYZ, :RotXYZ, :RotYXZ, :RotZXY, :RotXZY, :RotYZX, :RotZYX]
     @eval begin
         function principal_value(r::$rot_type{T}) where {T}
-            theta1 = mod_minus_pi_to_pi(r.theta1)
-            theta2 = mod_minus_pi_to_pi(r.theta2)
-            theta3 = mod_minus_pi_to_pi(r.theta3)
+            theta1 = rem2pi(r.theta1, RoundNearest)
+            theta2 = rem2pi(r.theta2, RoundNearest)
+            theta3 = rem2pi(r.theta3, RoundNearest)
             return $(rot_type){T}(theta1, theta2, theta3)
         end
     end
 end
+

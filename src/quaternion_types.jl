@@ -188,8 +188,8 @@ function Base.inv(q::Quat)
     Quat(q.w, -q.x, -q.y, -q.z)
 end
 
-@inline Base.one(::Type{Quat}) = Quat(1.0, 0.0, 0.0, 0.0)
-@inline Base.one(::Type{Quat{T}}) where {T} = Quat{T}(one(T), zero(T), zero(T), zero(T))
+@inline Base.one(::Type{Quat}) = Quat(1.0, 0.0, 0.0, 0.0, false)
+@inline Base.one(::Type{Quat{T}}) where {T} = Quat{T}(one(T), zero(T), zero(T), zero(T), false)
 
 """
     rotation_between(from, to)

@@ -125,6 +125,38 @@ Base.inv(r::RotMatrix) = RotMatrix(r.mat')
     RotMatrix([ret12 ret3])
 end
 
+# Lazy 2d rotation
+struct Angle{T} <: Rotation{2,T}
+    theta::T
+end
+
+@inline function Base.:*(r::Angle, v::StaticVector)
+    if length(v) != 2
+        throw(DimensionMismatch("Cannot rotate a vector of length $(length(v))"))
+    end
+    x,y = v
+    s,c = sincos(r.theta)
+    T = eltype(r)
+    similar_type(v,T)(c*x -s*y, s*x-c*y)
+end
+
+Base.:*(r1::Angle, r2::Angle) = Angle(r1.theta + r2.theta)
+Base.inv(r::Angle) = Angle(-r.theta)
+
+@inline function Base.getindex(r::Angle, i::Int)
+    if i == 1
+        cos(r.theta)
+    elseif i ==2
+        sin(r.theta)
+    elseif i == 3
+        -sin(r.theta)
+    elseif i == 4
+        cos(r.theta)
+    else
+        throw(BoundsError(r,i))
+    end
+end
+
 ################################################################################
 ################################################################################
 

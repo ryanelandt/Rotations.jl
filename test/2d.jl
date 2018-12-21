@@ -9,7 +9,7 @@ using Rotations, StaticArrays, Test
     @testset "Core" begin
         r = one(RotMatrix{2,Float32})
         @test RotMatrix((1,0,0,1)) == RotMatrix(@SMatrix [1 0; 0 1])
-        @test_throws ErrorException RotMatrix((1,0,0,1,0))
+        @test_throws DimensionMismatch RotMatrix((1,0,0,1,0))
     end
 
     ###############################

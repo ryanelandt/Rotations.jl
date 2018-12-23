@@ -132,6 +132,24 @@ using Rotations, StaticArrays, Test
             @test r1 * v ≈ r2 * v
         end
     end
+
+    @testset "Angle2d" begin
+        repeats = 100
+        Random.seed!(0)
+        for _ in 1:repeats
+            r = rand(Angle2d)
+            @test r^(-1) ≈ inv(r)
+            @test r^(-1.0) ≈ inv(r)
+            @test r^1 ≈ r
+            @test r^1.0 ≈ r
+            @test r^2 ≈ r*r
+            @test r^2.0 ≈ r*r
+
+            x = randn()
+            y = randn()
+            @test r^(x+y) ≈ r^x * r^y
+        end
+    end
 end
 
 nothing

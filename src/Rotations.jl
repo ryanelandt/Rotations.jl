@@ -20,6 +20,7 @@ include("principal_value.jl")
 
 export
     Rotation, RotMatrix, RotMatrix2, RotMatrix3,
+    Angle2d,
     Quat, SPQuat,
     AngleAxis, RodriguesVec,
     RotX, RotY, RotZ,

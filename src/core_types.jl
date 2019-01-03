@@ -157,13 +157,12 @@ Base.:*(r1::Angle2d, r2::Angle2d) = Angle2d(r1.theta + r2.theta)
 Base.:^(r::Angle2d, t::Real) = Angle2d(r.theta*t)
 Base.:^(r::Angle2d, t::Integer) = Angle2d(r.theta*t)
 Base.inv(r::Angle2d) = Angle2d(-r.theta)
-Base.transpose(r::Angle2d) = inv(r)
 rotation_angle(r::Angle2d) = r.theta
 
 @inline function Base.getindex(r::Angle2d, i::Int)
     if i == 1
         cos(r.theta)
-    elseif i ==2
+    elseif i == 2
         sin(r.theta)
     elseif i == 3
         -sin(r.theta)

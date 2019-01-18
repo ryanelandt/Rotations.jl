@@ -125,6 +125,54 @@ Base.inv(r::RotMatrix) = RotMatrix(r.mat')
     RotMatrix([ret12 ret3])
 end
 
+"""
+    struct Angle2d{T} <: Rotation{2,T}
+        theta::T
+    end
+
+A 2×2 rotation matrix parameterized by a 2D rotation by angle.
+Only the angle is stored inside the `Angle2d` type, values
+of `getindex` etc. are computed on the fly.
+"""
+struct Angle2d{T} <: Rotation{2,T}
+    theta::T
+end
+
+Angle2d(r::Angle2d) = r
+Angle2d{T}(r::Angle2d) where {T} = Angle2d{T}(T(r.theta))
+
+Base.one(::Type{A}) where {A<: Angle2d} = A(0)
+
+@inline function Base.:*(r::Angle2d, v::StaticVector)
+    if length(v) != 2
+        throw(DimensionMismatch("Cannot rotate a vector of length $(length(v))"))
+    end
+    x,y = v
+    s,c = sincos(r.theta)
+    T = eltype(r)
+    similar_type(v,T)(c*x - s*y, s*x + c*y)
+end
+
+Base.:*(r1::Angle2d, r2::Angle2d) = Angle2d(r1.theta + r2.theta)
+Base.:^(r::Angle2d, t::Real) = Angle2d(r.theta*t)
+Base.:^(r::Angle2d, t::Integer) = Angle2d(r.theta*t)
+Base.inv(r::Angle2d) = Angle2d(-r.theta)
+rotation_angle(r::Angle2d) = r.theta
+
+@inline function Base.getindex(r::Angle2d, i::Int)
+    if i == 1
+        cos(r.theta)
+    elseif i == 2
+        sin(r.theta)
+    elseif i == 3
+        -sin(r.theta)
+    elseif i == 4
+        cos(r.theta)
+    else
+        throw(BoundsError(r,i))
+    end
+end
+
 ################################################################################
 ################################################################################
 

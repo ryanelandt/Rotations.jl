@@ -145,8 +145,8 @@ Base.one(::Type{A}) where {A<: Angle2d} = A(0)
 
 rotation_angle(rot::Angle2d) = rot.theta
 function rotation_angle(rot::RotMatrix{2})
-    c = rot[1,1]
-    s = rot[2,1]
+    c = @inbounds rot[1,1]
+    s = @inbounds rot[2,1]
     atan(s, c)
 end
 

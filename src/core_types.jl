@@ -138,10 +138,17 @@ struct Angle2d{T} <: Rotation{2,T}
     theta::T
 end
 
-Angle2d(r::Angle2d) = r
-Angle2d{T}(r::Angle2d) where {T} = Angle2d{T}(T(r.theta))
+Angle2d(r::Rotation) = Angle2d(rotation_angle(r))
+Angle2d{T}(r::Rotation) where {T} = Angle2d{T}(T(rotation_angle(r)))
 
 Base.one(::Type{A}) where {A<: Angle2d} = A(0)
+
+rotation_angle(rot::Angle2d) = rot.theta
+function rotation_angle(rot::RotMatrix{2})
+    c = rot[1,1]
+    s = rot[2,1]
+    atan(s, c)
+end
 
 @inline function Base.:*(r::Angle2d, v::StaticVector)
     if length(v) != 2

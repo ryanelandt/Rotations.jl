@@ -13,8 +13,8 @@ Base.adjoint(r::Rotation) = inv(r)
 Base.transpose(r::Rotation{N,T}) where {N,T<:Real} = inv(r)
 
 # Rotation angles and axes can be obtained by converting to the AngleAxis type
-rotation_angle(r::Rotation) = rotation_angle(AngleAxis(r))
-rotation_axis(r::Rotation) = rotation_axis(AngleAxis(r))
+rotation_angle(r::Rotation{3}) = rotation_angle(AngleAxis(r))
+rotation_axis(r::Rotation{3}) = rotation_axis(AngleAxis(r))
 
 # `convert` goes through the constructors, similar to e.g. `Number`
 Base.convert(::Type{R}, rot::Rotation{N}) where {N,R<:Rotation{N}} = R(rot)
@@ -138,13 +138,13 @@ struct Angle2d{T} <: Rotation{2,T}
     theta::T
 end
 
-Angle2d(r::Rotation) = Angle2d(rotation_angle(r))
-Angle2d{T}(r::Rotation) where {T} = Angle2d{T}(T(rotation_angle(r)))
+Angle2d(r::Rotation{2}) = Angle2d(rotation_angle(r))
+Angle2d{T}(r::Rotation{2}) where {T} = Angle2d{T}(rotation_angle(r))
 
 Base.one(::Type{A}) where {A<: Angle2d} = A(0)
 
 rotation_angle(rot::Angle2d) = rot.theta
-function rotation_angle(rot::RotMatrix{2})
+function rotation_angle(rot::Rotation{2})
     c = @inbounds rot[1,1]
     s = @inbounds rot[2,1]
     atan(s, c)

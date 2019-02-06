@@ -130,6 +130,8 @@ using Rotations, StaticArrays, Test
             v = randn(2)
             @test r1 ≈ r2
             @test r1 * v ≈ r2 * v
+            @test RotMatrix{2}(r2) ≈ r1
+            @test Angle2d(r1) ≈ r2
         end
     end
 
@@ -148,6 +150,18 @@ using Rotations, StaticArrays, Test
             x = randn()
             y = randn()
             @test r^(x+y) ≈ r^x * r^y
+        end
+    end
+
+    @testset "angle" begin
+        repeats = 100
+        Random.seed!(0)
+        for _ in 1:repeats
+            theta = 2pi*rand() - pi
+            a2d = Angle2d(theta)
+            r2 = RotMatrix{2}(theta)
+            @test rotation_angle(r2) ≈ theta
+            @test rotation_angle(a2d) == theta
         end
     end
 end

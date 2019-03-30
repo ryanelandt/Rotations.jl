@@ -182,15 +182,18 @@ end
 ################################################################################
 ################################################################################
 
+_isrotation_eps(T::Type{<:Integer}) = zero(T)
+_isrotation_eps(T) = eps(T)
+
 """
     isrotation(r)
     isrotation(r, tol)
 
-Check whether `r` is a 3×3 rotation matrix, where `r * r'` is within `tol` of
-the identity matrix (using the Frobenius norm). (`tol` defaults to
-`1000 * eps(eltype(r))`.)
+Check whether `r` is a 2x2 or 3×3 rotation matrix, where `r * r'` is within
+`tol` of the identity matrix (using the Frobenius norm). `tol` defaults to
+`1000 * eps(float(eltype(r)))` or `zero(T)` for integer `T`.
 """
-function isrotation(r::AbstractMatrix{T}, tol::Real = 1000 * eps(eltype(T))) where T
+function isrotation(r::AbstractMatrix{T}, tol::Real = 1000 * _isrotation_eps(eltype(T))) where T
     if size(r) == (2,2)
         # Transpose is overloaded for many of our types, so we do it explicitly:
         r_trans = @SMatrix [conj(r[1,1])  conj(r[2,1]);
@@ -205,7 +208,7 @@ function isrotation(r::AbstractMatrix{T}, tol::Real = 1000 * eps(eltype(T))) whe
         return false
     end
 
-    return d < tol && det(r) > 0
+    return d <= tol && det(r) > 0
 end
 
 # A simplification and specialization of the Base.show function for AbstractArray makes

@@ -318,6 +318,10 @@ all_types = (RotMatrix{3}, Quat, SPQuat, AngleAxis, RodriguesVec,
          0.0 0.0 1.0
          0.0 1.0 0.0]
       @test !isrotation(a) 
+
+      # isrotation should work for integer (or boolean) matrices (issue #94)
+      @test isrotation([0 1 0; -1 0 0; 0 0 1])
+      @test isrotation(Matrix(I,3,3))
     end 
     
     @testset "Testing type aliases" begin

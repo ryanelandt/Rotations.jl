@@ -208,8 +208,13 @@ all_types = (RotMatrix{3}, Quat, SPQuat, AngleAxis, RodriguesVec,
         for type_rot in all_types
             for _ = 1:100
                 not_orthonormal = rand(type_rot) + rand(3, 3) * pert
+<<<<<<< HEAD
                 quat_ill_condition = Quat(not_orthonormal)
                 @test 0 <= quat_ill_condition.w
+=======
+				quat_ill_condition = Quat(not_orthonormal)
+				@test 0 <= quat_ill_condition.w 
+>>>>>>> 230b797120d59e97bcda1759fda7330bec144a11
                 @test norm(quat_ill_condition - nearest_orthonormal(not_orthonormal)) < 10 * pert
             end
         end
